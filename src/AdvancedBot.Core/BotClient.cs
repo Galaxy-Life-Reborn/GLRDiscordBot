@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using AdvancedBot.Core.Commands;
 using AdvancedBot.Core.Services;
+using GLR.Net;
 
 namespace AdvancedBot.Core
 {
@@ -66,6 +67,7 @@ namespace AdvancedBot.Core
                 .AddSingleton<LiteDBHandler>()
                 .AddSingleton<GuildAccountService>()
                 .AddSingleton<PaginatorService>()
+                .AddSingleton<GLRClient>()
                 .BuildServiceProvider();
         }
     }

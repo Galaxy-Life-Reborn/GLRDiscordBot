@@ -4,8 +4,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="GLR.Net" Version="1.2.0"/>
     <PackageReference Include="Discord.Net" Version="2.1.1"/>
     <PackageReference Include="LiteDB" Version="5.0.7"/>
     <PackageReference Include="Humanizer" Version="2.8.26"/>
+    <PackageReference Include="CoreHtmlToImage" Version="1.0.6"/>
   </ItemGroup>
 </Project>
