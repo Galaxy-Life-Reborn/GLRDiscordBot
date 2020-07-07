@@ -1,9 +1,10 @@
 ﻿using AdvancedBot.Core.Commands;
-using CoreHtmlToImage;
 using Discord;
 using Discord.Commands;
 using GLR.Net;
 using GLR.Net.Entities;
+using Humanizer;
+using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -100,25 +101,38 @@ namespace GLR.Core.Commands.Modules
             .Build());
         }
 
-        [Command("stat")]
+        [Command("stat", RunMode = RunMode.Async)]
         [Summary("Test stats command in the works.")]
         public async Task DisplayStatWithImage(string user = "")
         {
+            var templateHtml = File.ReadAllText("stats/TemplateCard.html");
+
             if (string.IsNullOrEmpty(user)) user = Context.User.Username;
             var id = await _client.GetIdAsync(user);
+
             var profile = await _client.GetProfileAsync(id);
+            var stats = await _client.GetStatisticsAsync(id);
 
-            var converter = new HtmlConverter();
-            var html = $"<style>.user {{padding: 20px; font-family:'sans-serif'; }}</style><div class='user'>{profile.Username}</div>";
-            var bytes = converter.FromHtmlString(html);
+            var newHtml = FormatHtmlForStats(templateHtml, profile, stats);
+            File.WriteAllText($"stats/{user}.html", newHtml);
 
-            //var fileName = $"{profile.Username}.jpg";
-            //File.WriteAllBytes(fileName, bytes);
-            var image = new MemoryStream(bytes);
+            await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
+            var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            {
+                Args = new string[] { "--no-sandbox"},
+                Headless = true,
+                DefaultViewport = new ViewPortOptions()
+                {
+                    Width = 426,
+                    Height = 206
+                }
+            });
+            var page = await browser.NewPageAsync();
+            await page.GoToAsync($"file:///{Environment.CurrentDirectory}/stats/{user}.html");
 
-            await Context.Channel.SendFileAsync(image, "Statistics.jpg");
+            await page.ScreenshotAsync($"{Environment.CurrentDirectory}/stats/{user}.png");
 
-            //File.Delete(fileName);
+            await Context.Channel.SendFileAsync($"stats/{user}.png");
         }
 
         [Command("leaderboard")][Alias("lb")]
@@ -255,6 +269,24 @@ namespace GLR.Core.Commands.Modules
             else if (experiencePoints > 10000) return $"{Math.Round(experiencePoints / 1000, 2)}K";
 
             else return experiencePoints.ToString();
+        }
+    
+        private string FormatHtmlForStats(string original, Profile profile, Statistics stats)
+        {
+            var pieces = original.Split("|");
+            pieces[1] = profile.ImageUrl;
+            pieces[3] = profile.Username;
+            pieces[5] = stats.AllianceName;
+            pieces[7] = stats.Level.ToString();
+            pieces[9] = profile.AmountOfFriends.ToString();
+            pieces[11] = stats.Starbase.ToString();
+            pieces[13] = profile.CreationDate.ToShortDateString();
+            pieces[15] = stats.Status == Status.Online ? "https://i.imgur.com/cuFVhuL.png" : "https://i.imgur.com/qHRoNBA.png";
+            pieces[17] = stats.Status == Status.Online ? "Online" : "Offline";
+            pieces[19] = stats.Colonies.ToString();
+            pieces[21] = stats.LastOnline.ToShortDateString();
+
+            return string.Join("", pieces);
         }
     }
 }
