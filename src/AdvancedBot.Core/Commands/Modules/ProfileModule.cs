@@ -131,6 +131,7 @@ namespace GLR.Core.Commands.Modules
             await page.GoToAsync($"file:///{Environment.CurrentDirectory}/stats/{user}.html");
 
             await page.ScreenshotAsync($"{Environment.CurrentDirectory}/stats/{user}.png");
+            browser.Dispose();
 
             await Context.Channel.SendFileAsync($"stats/{user}.png");
         }
