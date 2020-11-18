@@ -52,7 +52,7 @@ namespace GLR.Core.Commands.Modules
 
         [Command("friends", RunMode = RunMode.Async)]
         [Summary("Displays the GLR friends of a certain user.")]
-        public async Task Friends(string user = "")
+        public async Task Friends([Remainder]string user = "")
         {
             if (string.IsNullOrEmpty(user)) user = Context.User.Username;
 
@@ -73,7 +73,7 @@ namespace GLR.Core.Commands.Modules
 
         [Command("statistics")][Alias("stats")]
         [Summary("Displays the GLR statistics for a certain user.")]
-        public async Task Stats(string user = "")
+        public async Task Stats([Remainder]string user = "")
         {
             if (string.IsNullOrEmpty(user)) user = Context.User.Username;
             var id = await _client.GetIdAsync(user);
@@ -103,7 +103,7 @@ namespace GLR.Core.Commands.Modules
 
         [Command("stat", RunMode = RunMode.Async)]
         [Summary("Test stats command in the works.")]
-        public async Task DisplayStatWithImage(string user = "")
+        public async Task DisplayStatWithImage([Remainder]string user = "")
         {
             var templateHtml = File.ReadAllText("stats/TemplateCard.html");
 
