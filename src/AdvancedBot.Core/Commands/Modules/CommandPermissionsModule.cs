@@ -1,9 +1,10 @@
 using System.Linq;
 using System.Threading.Tasks;
+using AdvancedBot.Core.Commands.Preconditions;
+using AdvancedBot.Core.Services.Commands;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using AdvancedBot.Core.Commands.Preconditions;
-using Discord;
 
 namespace AdvancedBot.Core.Commands.Modules
 {
@@ -11,24 +12,23 @@ namespace AdvancedBot.Core.Commands.Modules
     [Group("command")][Alias("c", "cmd")]
     [Summary("Handles all commands regarding command permissions.")]
     public class CommandPermissionsModule : TopModule
-    {        
+    {
+        public CommandPermissionService Permissions { get; set; }
+
         [Command("enable")]
-        [Summary("Enables a command.")]
-        public async Task EnableCommandAsync([Remainder]string commandName)
+        [Summary("Enables a command or a category.")]
+        public async Task EnableCommandOrModuleAsync([Remainder]string input)
         {
-            var command = Commands.GetCommandInfo(commandName);
-
             var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
-            var formattedName = FormatCommandName(command);
 
-            guild.EnableCommand(formattedName);
-           
+            Permissions.EnableGuildCommandOrModule(guild, input);
+  
             Accounts.SaveGuildAccount(guild);
-            await ReplyAsync($"Successfully enabled `{formattedName}`.");
+            await ReplyAsync($"Successfully enabled all commands associated with {input}");
         }
 
         [Command("disable")]
-        [Summary("Disables a command.")]
+        [Summary("Disables a command or module.")]
         public async Task DisableCommandAsync([Remainder]string commandName)
         {
             var command = Commands.GetCommandInfo(commandName);
@@ -83,7 +83,8 @@ namespace AdvancedBot.Core.Commands.Modules
                             ? $"No roles have been put on the list."
                             : $"**Roles:**<#{string.Join("> <#", cmd.WhitelistedRoles)}>";
 
-                await ReplyAsync($"Blacklist enabled for roles: `{cmd.RolesListIsBlacklist}`.\n" +
+                await ReplyAsync($"**Info for {cmd.Name} regarding roles.**\n" + 
+                                $"Blacklist enabled: `{cmd.RolesListIsBlacklist}`.\n" +
                                 $"{roleList}");
             }
 
@@ -162,7 +163,8 @@ namespace AdvancedBot.Core.Commands.Modules
                             ? $"No channels have been put on the list."
                             : $"**Channels:**<#{string.Join("> <#", cmd.WhitelistedChannels)}>";
 
-                await ReplyAsync($"Blacklist enabled for channels: `{cmd.ChannelListIsBlacklist}`.\n" +
+                await ReplyAsync($"**Info for {cmd.Name} regarding channels.**\n" + 
+                                $"Blacklist enabled: `{cmd.ChannelListIsBlacklist}`.\n" +
                                 $"{channelList}");
             }
 

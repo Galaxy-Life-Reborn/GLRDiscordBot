@@ -37,7 +37,7 @@ namespace AdvancedBot.Core.Commands
             var embed = new EmbedBuilder()
             {
                 Title = "About the bot",
-                Description = $"For a bare list of all commands, execute `!commands`, for a bare list of categories, execute `!modules`" + 
+                Description = $"For a bare list of all commands, execute `!commands`\nFor a bare list of categories, execute `!modules`\n" + 
                               $"**Documentation:** {documentation}\n\n**Source code:** {sourceRepo}\n\n" +
                               $"**Made possible by:** {_contributers}\n\n**Invite the bot:** {botInvite}",
                 ThumbnailUrl = context.Client.CurrentUser.GetAvatarUrl(),
@@ -125,7 +125,7 @@ namespace AdvancedBot.Core.Commands
                 result.Add(cmd.Module, cmd);
             }     
 
-            else throw new Exception("Could not find a module or command for the given input.");
+            else throw new Exception("Could not find a category or command for the given input.");
 
             return result.FirstOrDefault();
         }
@@ -136,17 +136,17 @@ namespace AdvancedBot.Core.Commands
         public string AllModulesToString()
             => string.Join(", ", Modules.Select(module => $"{module.Aliases.First()}").Where(alias => !string.IsNullOrEmpty(alias)));
 
-        private List<string> ListAllCommandAliases()
+        private string[] ListAllCommandAliases()
         {
             var aliases = new List<string>();
-            var commands = Commands.ToList();
+            var commands = Commands.ToArray();
 
-            for (int i = 0; i < commands.Count; i++)
+            for (int i = 0; i < commands.Length; i++)
             {
                 aliases.AddRange(commands[i].Aliases);
             }
 
-            return aliases;
+            return aliases.ToArray();
         }
 
         private List<string> ListAllModuleAliases()
@@ -163,6 +163,9 @@ namespace AdvancedBot.Core.Commands
             return aliases;
         }
 
+        public string FormatCommandName(CommandInfo command)
+            => $"{command.Module.Name}_{command.Name}".ToLower();
+
         public CommandInfo GetCommandInfo(string commandName)
         {
             var searchResult = Search(commandName);
@@ -171,25 +174,15 @@ namespace AdvancedBot.Core.Commands
             return searchResult.Commands.OrderBy(x => x.Command.Priority).FirstOrDefault().Command;
         }
 
-        public EmbedBuilder GetCommandHelpEmbed(CommandInfo command)
-            => new EmbedBuilder()
-            .WithTitle($"**{command.Name}** | {string.Join(", ", command.Aliases)}\n")
-            .WithDescription($"{command.Summary}\n\u200b");
-
         public string GenerateCommandUsage(CommandInfo command)
         {
             StringBuilder parameters = new StringBuilder();
 
             for (int i = 0; i < command.Parameters.Count; i++)
             {
-                var pref = "<";
-                var suff = ">";
+                var pref = command.Parameters[i].IsOptional ? "[" : "<";
+                var suff = command.Parameters[i].IsOptional ? "]" : ">";
                 
-                if (command.Parameters[i].IsOptional)
-                {
-                    pref = "["; suff = "]";
-                }
-
                 parameters.Append($"{pref}{command.Parameters[i].Name.Underscore().Dasherize()}{suff} ");
             }
             

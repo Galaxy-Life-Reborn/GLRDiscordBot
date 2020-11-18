@@ -5,7 +5,6 @@ using AdvancedBot.Core.Extensions;
 using AdvancedBot.Core.Services.DataStorage;
 using System;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using AdvancedBot.Core.Commands;
 
@@ -28,7 +27,7 @@ namespace AdvancedBot.Core.Services.Commands
 
         public async Task InitializeAsync()
         {
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+            await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
 
             _client.MessageReceived += OnMessageReceived;
             _commands.CommandExecuted += OnCommandExecuted;
@@ -49,7 +48,8 @@ namespace AdvancedBot.Core.Services.Commands
             var guild = _accounts.GetOrCreateGuildAccount(guildId);
 
             int argPos = 0;
-            if (!message.HasPrefix(_client, out argPos, guild.Prefixes)) { return; }
+            if (!message.HasPrefix(_client, out argPos, guild.Prefixes)) 
+                return;
 
             var context = new SocketCommandContext(_client, message);
             var result = await _commands.ExecuteAsync(context, argPos, _services);
@@ -64,7 +64,7 @@ namespace AdvancedBot.Core.Services.Commands
             }
 
             if (result.Error == CommandError.UnknownCommand) return;
-            if (result.Error == CommandError.BadArgCount)
+            else if (result.Error == CommandError.BadArgCount)
             {
                 await SendWrongParameterCountMessage(ctx, cmd.Value);
                 return;
@@ -99,9 +99,10 @@ namespace AdvancedBot.Core.Services.Commands
             var usage = _commands.GenerateCommandUsage(command);
 
             var embed = new EmbedBuilder()
-            .WithTitle("Command wrongly executed")
-            .AddField($"Command example:", usage)
+            .WithTitle("Wrongly executed, correct example:")
+            .WithDescription(usage)
             .WithFooter("Tip: <> means mandatory, [] optional")
+            .WithColor(Color.Red)
             .Build();
 
             await ctx.Channel.SendMessageAsync("", false, embed);

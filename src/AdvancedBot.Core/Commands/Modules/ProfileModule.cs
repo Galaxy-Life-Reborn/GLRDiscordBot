@@ -274,7 +274,7 @@ namespace GLR.Core.Commands.Modules
     
         private string FormatHtmlForStats(string original, Profile profile, Statistics stats)
         {
-            var pieces = original.Split("|");
+            var pieces = original.Split('|');
             pieces[1] = profile.ImageUrl;
             pieces[3] = profile.Username;
             pieces[5] = stats.AllianceName;

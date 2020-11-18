@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
 using AdvancedBot.Core.Services.Commands;
 using AdvancedBot.Core.Services.DataStorage;
@@ -30,7 +29,9 @@ namespace AdvancedBot.Core
             _commands = commands ?? new CustomCommandService(new CustomCommandServiceConfig
             {
                 CaseSensitiveCommands = false,
-                LogLevel = LogSeverity.Info
+                LogLevel = LogSeverity.Info,
+                BotInviteIsPrivate = true,
+                RepositoryUrl = "https://github.com/svr333/AdvancedBot-Template"
             });
         }
 
@@ -68,6 +69,7 @@ namespace AdvancedBot.Core
                 .AddSingleton<GuildAccountService>()
                 .AddSingleton<PaginatorService>()
                 .AddSingleton<GLRClient>()
+                .AddSingleton<CommandPermissionService>()
                 .BuildServiceProvider();
         }
     }
