@@ -3,6 +3,7 @@ using Discord;
 using Discord.Commands;
 using GLR.Net;
 using GLR.Net.Entities;
+using GLR.Net.Entities.Enums;
 using Humanizer;
 using PuppeteerSharp;
 using System;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using UserStatus = GLR.Net.Entities.Enums.UserStatus;
 
 namespace GLR.Core.Commands.Modules
 {
@@ -29,22 +31,19 @@ namespace GLR.Core.Commands.Modules
         {
             if (string.IsNullOrEmpty(user)) user = Context.User.Username;
 
-            var id = await _client.GetIdAsync(user);
-            var profile = await _client.GetProfileAsync(id);
+            var profile = await _client.GetUserInfo(user);
 
-            var displayRank = profile.RankInfo.Rank == Rank.Banned ? "**BANNED**" : $"a {profile.RankInfo.Rank}";
+            var displayRank = profile.RankInfo == Rank.Banned ? "**BANNED**" : $"a {profile.RankInfo}";
 
             var embed = new EmbedBuilder()
                 .WithTitle($"Game profile for {profile.Username}")
-                .WithUrl(profile.Url)
-                .WithThumbnailUrl(profile.ImageUrl)
+                //.WithUrl(profile.Url)
+                //.WithThumbnailUrl("profile.ImageUrl")
                 .WithDescription($"\nThis user has ID **{profile.Id}**." +
                                 $"\n**{profile.Username}** is {displayRank}.")
-                .AddField("Friends", $"The user has **{profile.AmountOfFriends}** friends." +
-                    $"\nThe user has **{profile.AmountOfIncomingRequests}** pending incoming requests." +
-                    $"\nThe user has **{profile.AmountOfOutgoingRequests}** pending outgoing requests.")
-                .WithFooter($"Account created on {profile.CreationDate.ToLongDateString()}")
-                .WithColor(profile.RankInfo.ColourValue)
+                .AddField("Friends", $"This user has **{profile.Friends.Length}** friends.")
+                .WithFooter($"Account created on {profile.CreatedAt.ToLongDateString()}")
+                .WithColor(GetColourBasedOnRank(profile.RankInfo))
                 .Build();
 
             await ReplyAsync("", false, embed);
@@ -56,18 +55,17 @@ namespace GLR.Core.Commands.Modules
         {
             if (string.IsNullOrEmpty(user)) user = Context.User.Username;
 
-            var id = await _client.GetIdAsync(user);
-            var profile = await _client.GetProfileAsync(id);
-            var friends = await _client.GetFriendsAsync(id);
-            if (friends is null) await ReplyAsync("User doesn't have any friends!");
+            var profile = await _client.GetUserInfo(user);
+
+            if (profile.Friends is null) await ReplyAsync("User doesn't have any friends!");
             
-            var displayTexts = friends.Select(x => $"**{x.Username}** ({x.Id})");
+            var displayTexts = profile.Friends.Select(x => $"**{x.Username}** ({x.Id})");
 
             var templateEmbed = new EmbedBuilder()
                                 .WithTitle($"Friends for {profile.Username}")
                                 .WithColor(Color.DarkBlue)
                                 .WithAuthor("", "", "")
-                                .WithFooter("Friends are ordered by day you added them.", "");
+                                .WithFooter("Friends are ordered by the day you added them.", "");
             await SendPaginatedMessageAsync(displayTexts, templateEmbed);
         }
 
@@ -76,27 +74,25 @@ namespace GLR.Core.Commands.Modules
         public async Task Stats([Remainder]string user = "")
         {
             if (string.IsNullOrEmpty(user)) user = Context.User.Username;
-            var id = await _client.GetIdAsync(user);
-            var profile = await _client.GetProfileAsync(id);
 
-            var stats = await _client.GetStatisticsAsync(id);
+            var profile = await _client.GetUserAsync(user);
 
-            var displayAlliance = stats.AllianceName == "None" ? "User is not in any alliance." : $"User is part of **{stats.AllianceName}**.";
+            var displayAlliance = profile.Statistics.Alliance == "None" ? "User is not in any alliance." : $"User is part of **{profile.Statistics.Alliance}**.";
 
             await ReplyAsync("", false, new EmbedBuilder()
             {
-                Title = $"Statistics for {stats.Username} ({id})",
-                Url = profile.Url,
+                Title = $"Statistics for {profile.Info.Username} ({profile.Info.Id})",
+                //Url = profile.Url,
                 Color = Color.DarkMagenta,
-                ThumbnailUrl = $"https://galaxylifereborn.com/uploads/avatars/{id}.png?t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
-                Description = $"{displayAlliance}\nUser is level **{stats.Level}**.\n\u200b"
+                ThumbnailUrl = $"https://web.galaxylifereborn.com/accounts/avatars/{profile.Info.Id}.png?t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
+                Description = $"{displayAlliance}\nUser is level **{profile.Statistics.Level}**.\n\u200b"
             }
-            .AddField("Experience", FormatNumbers(stats.ExperiencePoints), true)
-            .AddField("Starbase", stats.Starbase, true)
-            .AddField("Colonies", stats.Colonies, true)
-            .AddField("Missions", stats.MissionsCompleted, true)
-            .AddField("Status", stats.Status, true)
-            .AddField("Last seen", stats.LastOnline.ToShortDateString(), true)
+            .AddField("Experience", FormatNumbers(profile.Statistics.Experience), true)
+            .AddField("Starbase", profile.Statistics.Starbase, true)
+            .AddField("Colonies", profile.Statistics.Colonies, true)
+            .AddField("Missions", profile.Statistics.MissionsCompleted, true)
+            .AddField("Status", profile.Statistics.Status, true)
+            .AddField("Attacks Done", profile.Statistics.AttacksDone, true)
             .WithFooter($"Requested by {Context.User.Username} | {Context.User.Id}")
             .Build());
         }
@@ -108,12 +104,10 @@ namespace GLR.Core.Commands.Modules
             var templateHtml = File.ReadAllText("stats/TemplateCard.html");
 
             if (string.IsNullOrEmpty(user)) user = Context.User.Username;
-            var id = await _client.GetIdAsync(user);
 
-            var profile = await _client.GetProfileAsync(id);
-            var stats = await _client.GetStatisticsAsync(id);
+            var profile = await _client.GetUserAsync(user);
 
-            var newHtml = FormatHtmlForStats(templateHtml, profile, stats);
+            var newHtml = FormatHtmlForStats(templateHtml, profile.Info, profile.Statistics);
             File.WriteAllText($"stats/{user}.html", newHtml);
 
             await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
@@ -134,6 +128,42 @@ namespace GLR.Core.Commands.Modules
             browser.Dispose();
 
             await Context.Channel.SendFileAsync($"stats/{user}.png");
+        }
+
+        [Command("status")]
+        public async Task DisplayServerStatusAsync()
+        {
+            ServerStatus status = null;
+
+            try
+            {
+                status = await _client.GetServerStatus();
+            }
+            catch (TaskCanceledException e)
+            {
+                await ReplyAsync("Request timed out, servers are off.");
+                return;
+            }
+            
+            if (!status.Ready)
+            {
+                await ReplyAsync($"Servers have been launching for **{(DateTime.UtcNow - status.OnlineSince).Humanize()}**");
+                return;
+            }
+
+            var embed = new EmbedBuilder()
+            {
+                Title = $"GLR Server Status",
+                Description = $"Servers are **online** since **{status.OnlineSince.ToLongTimeString()}** (miracle init)",
+                Color = Color.Blue
+            }
+            .AddField("Total Commands Executed", FormatNumbers(status.TotalCommandsExecuted), true)
+            .AddField("Commands Executed", FormatNumbers(status.CommandsExecutedSinceLaunch), true)
+            .AddField("Total Stars", status.TotalStars, false)
+            .AddField("Total Players", status.TotalPlayers, true)
+            .AddField("Online Players", status.OnlinePlayers, true);
+
+            await ReplyAsync("", false, embed.Build());
         }
 
         [Command("leaderboard")][Alias("lb")]
@@ -166,21 +196,19 @@ namespace GLR.Core.Commands.Modules
         {
             if (baseUser.ToLower() == secondUser.ToLower()) throw new Exception("Please enter two different users to compare.");
 
-            var baseUserId = await _client.GetIdAsync(baseUser);
-            var baseUserStats = await _client.GetStatisticsAsync(baseUserId);
+            var baseUserStats = await _client.GetUserAsync(baseUser);
 
-            var secondUserId = await _client.GetIdAsync(secondUser);
-            var secondUserStats = await _client.GetStatisticsAsync(secondUserId);
+            var secondUserStats = await _client.GetUserAsync(secondUser);
 
-            var expDifference = Math.Round((decimal)baseUserStats.ExperiencePoints / secondUserStats.ExperiencePoints, 2);
+            var expDifference = Math.Round((decimal)baseUserStats.Statistics.Experience / secondUserStats.Statistics.Experience, 2);
 
             await ReplyAsync("", false, new EmbedBuilder()
             {
-                Title = $"Comparison between {baseUserStats.Username} & {secondUserStats.Username}",
-                Description = $"{baseUserStats.Username} has **{expDifference}x** the experience of {secondUserStats.Username}\n" +
-                              $"Difference of **{FormatNumbers(Math.Abs((decimal)baseUserStats.ExperiencePoints - secondUserStats.ExperiencePoints))}** experience.\n\n" + 
-                              $"{baseUserStats.Username} has **{FormatNumbers(baseUserStats.ExperiencePoints)}** experience and is level **{baseUserStats.Level}**.\n" +
-                              $"{secondUserStats.Username} has **{FormatNumbers(secondUserStats.ExperiencePoints)}** experience and is level **{secondUserStats.Level}**.",
+                Title = $"Comparison between {baseUserStats.Info.Username} & {secondUserStats.Info.Username}",
+                Description = $"{baseUserStats.Info.Username} has **{expDifference}x** the experience of {secondUserStats.Info.Username}\n" +
+                              $"Difference of **{FormatNumbers(Math.Abs((decimal)baseUserStats.Statistics.Experience - secondUserStats.Statistics.Experience))}** experience.\n\n" + 
+                              $"{baseUserStats.Info.Username} has **{FormatNumbers(baseUserStats.Statistics.Experience)}** experience and is level **{baseUserStats.Statistics.Level}**.\n" +
+                              $"{secondUserStats.Info.Username} has **{FormatNumbers(secondUserStats.Statistics.Experience)}** experience and is level **{secondUserStats.Statistics.Level}**.",
                 Color = expDifference > 1 ? Color.DarkGreen : Color.DarkOrange
             }
             .Build());
@@ -197,25 +225,47 @@ namespace GLR.Core.Commands.Modules
         {
             if (baseUser.ToLower() == userToCompare.ToLower()) throw new Exception("Please enter two different users to compare.");
 
-            var baseUserId = await _client.GetIdAsync(baseUser);
-            var baseUserStats = await _client.GetStatisticsAsync(baseUserId);
+            var baseUserStats = await _client.GetUserAsync(baseUser);
 
-            var secondUserId = await _client.GetIdAsync(userToCompare);
-            var secondUserStats = await _client.GetStatisticsAsync(secondUserId);
+            var secondUserStats = await _client.GetUserAsync(userToCompare);
 
-            var expToGain = (long)secondUserStats.ExperiencePoints - (long)baseUserStats.ExperiencePoints;
-            if (expToGain < 0) throw new Exception($"{baseUserStats.Username} is already ahead of {secondUserStats.Username}");
-            else if (expToGain == 0) throw new Exception($"{baseUserStats.Username} & {secondUserStats.Username} have equally as much exp.");
+            var expToGain = (long) secondUserStats.Statistics.Experience - (long) baseUserStats.Statistics.Experience;
+            
+            if (expToGain < 0) throw new Exception($"{baseUserStats.Info.Username} is already ahead of {secondUserStats.Info.Username}");
+            else if (expToGain == 0) throw new Exception($"{baseUserStats.Info.Username} & {secondUserStats.Info.Username} have equally as much exp.");
             
             await ReplyAsync("", false, new EmbedBuilder()
             {
-                Title = $"Exp needed to beat {secondUserStats.Username}",
-                Description = $"{baseUserStats.Username} has **{FormatNumbers(baseUserStats.ExperiencePoints)}** experience and is level **{baseUserStats.Level}**.\n" +
-                              $"{secondUserStats.Username} has **{FormatNumbers(secondUserStats.ExperiencePoints)}** experience and is level **{secondUserStats.Level}**.\n\n" +
+                Title = $"Exp needed to beat {secondUserStats.Info.Username}",
+                Description = $"{baseUserStats.Info.Username} has **{FormatNumbers(baseUserStats.Statistics.Experience)}** experience and is level **{baseUserStats.Statistics.Level}**.\n" +
+                              $"{secondUserStats.Info.Username} has **{FormatNumbers(secondUserStats.Statistics.Experience)}** experience and is level **{secondUserStats.Statistics.Level}**.\n\n" +
                               $"{GetVisualizationForProgressNecessary(expToGain, fact)}",
                 Color = Color.DarkMagenta
             }
             .Build());
+        }
+
+        private uint GetColourBasedOnRank(Rank rank)
+        {
+            switch (rank)
+            {
+                case Rank.Developer:
+                    return 480472;
+                case Rank.Administrator:
+                    return 3172029;
+                case Rank.Moderator:
+                    return 2605694;
+                case Rank.Tester:
+                    return 16729674;
+                case Rank.Supporter:
+                    return 15710778;
+                case Rank.Locked:
+                    return 16777215;
+                case Rank.Banned:
+                    return 16777215;
+                default:
+                    return 000000;
+            }
         }
 
         private string GetVisualizationForProgressNecessary(decimal expDifference, string fact = "")
@@ -272,20 +322,20 @@ namespace GLR.Core.Commands.Modules
             else return experiencePoints.ToString();
         }
     
-        private string FormatHtmlForStats(string original, Profile profile, Statistics stats)
+        private string FormatHtmlForStats(string original, UserInfo profile, Statistics stats)
         {
             var pieces = original.Split('|');
-            pieces[1] = profile.ImageUrl;
+            //pieces[1] = profile.ImageUrl;
             pieces[3] = profile.Username;
-            pieces[5] = stats.AllianceName;
+            pieces[5] = stats.Alliance;
             pieces[7] = stats.Level.ToString();
-            pieces[9] = profile.AmountOfFriends.ToString();
+            pieces[9] = profile.Friends.Length.ToString();
             pieces[11] = stats.Starbase.ToString();
-            pieces[13] = profile.CreationDate.ToShortDateString();
-            pieces[15] = stats.Status == Status.Online ? "https://i.imgur.com/cuFVhuL.png" : "https://i.imgur.com/qHRoNBA.png";
-            pieces[17] = stats.Status == Status.Online ? "Online" : "Offline";
+            pieces[13] = profile.CreatedAt.ToShortDateString();
+            pieces[15] = stats.Status == UserStatus.Online ? "https://i.imgur.com/cuFVhuL.png" : "https://i.imgur.com/qHRoNBA.png";
+            pieces[17] = stats.Status == UserStatus.Online ? "Online" : "Offline";
             pieces[19] = stats.Colonies.ToString();
-            pieces[21] = stats.LastOnline.ToShortDateString();
+            pieces[21] = stats.AttacksDone.ToString();
 
             return string.Join("", pieces);
         }
