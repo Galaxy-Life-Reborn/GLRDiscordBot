@@ -38,7 +38,7 @@ namespace GLR.Core.Commands.Modules
             var embed = new EmbedBuilder()
                 .WithTitle($"Game profile for {profile.Username}")
                 .WithUrl(profile.ProfileUrl)
-                .WithThumbnailUrl("profile.ImageUrl")
+                .WithThumbnailUrl(profile.ImageUrl)
                 .WithDescription($"\nThis user has ID **{profile.Id}**." +
                                 $"\n**{profile.Username}** is {displayRank}.")
                 .AddField("Friends", $"This user has **{profile.Friends.Length}** friends.")
