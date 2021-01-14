@@ -37,8 +37,8 @@ namespace GLR.Core.Commands.Modules
 
             var embed = new EmbedBuilder()
                 .WithTitle($"Game profile for {profile.Username}")
-                //.WithUrl(profile.Url)
-                //.WithThumbnailUrl("profile.ImageUrl")
+                .WithUrl(profile.ProfileUrl)
+                .WithThumbnailUrl("profile.ImageUrl")
                 .WithDescription($"\nThis user has ID **{profile.Id}**." +
                                 $"\n**{profile.Username}** is {displayRank}.")
                 .AddField("Friends", $"This user has **{profile.Friends.Length}** friends.")
@@ -82,7 +82,7 @@ namespace GLR.Core.Commands.Modules
             await ReplyAsync("", false, new EmbedBuilder()
             {
                 Title = $"Statistics for {profile.Info.Username} ({profile.Info.Id})",
-                //Url = profile.Url,
+                Url = profile.Info.ImageUrl,
                 Color = Color.DarkMagenta,
                 ThumbnailUrl = $"https://web.galaxylifereborn.com/accounts/avatars/{profile.Info.Id}.png?t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
                 Description = $"{displayAlliance}\nUser is level **{profile.Statistics.Level}**.\n\u200b"
