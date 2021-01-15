@@ -16,18 +16,23 @@ namespace AdvancedBot.Core.Services.Commands
         private readonly CustomCommandService _commands;
         private readonly IServiceProvider _services;
         private readonly GuildAccountService _accounts;
+        private readonly ServerStatusVc _vc;
 
-        public CommandHandlerService(DiscordSocketClient client, CustomCommandService commands, IServiceProvider services, GuildAccountService accounts)
+        public CommandHandlerService(DiscordSocketClient client, CustomCommandService commands, IServiceProvider services,
+                                    GuildAccountService accounts, ServerStatusVc vc)
         {
             _commands = commands;
             _client = client;
             _services = services;
             _accounts = accounts;
+            _vc = vc;
         }
 
         public async Task InitializeAsync()
         {
             await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
+
+            _vc.Initialize();
 
             _client.MessageReceived += OnMessageReceived;
             _commands.CommandExecuted += OnCommandExecuted;

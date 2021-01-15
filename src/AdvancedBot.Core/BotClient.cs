@@ -57,7 +57,10 @@ namespace AdvancedBot.Core
             => Console.WriteLine($"{msg.Source}: {msg.Message}");
 
         private async Task OnReadyAsync()
-            => await _client.SetGameAsync("Being a bot.");
+        {
+            Console.WriteLine($"This bot is currently in {_client.Guilds.Count} servers.");
+            await _client.SetGameAsync("Being a bot.");
+        }
 
         private ServiceProvider ConfigureServices()
         {
@@ -70,6 +73,7 @@ namespace AdvancedBot.Core
                 .AddSingleton<PaginatorService>()
                 .AddSingleton<GLRClient>()
                 .AddSingleton<CommandPermissionService>()
+                .AddSingleton<ServerStatusVc>()
                 .BuildServiceProvider();
         }
     }
