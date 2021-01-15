@@ -34,7 +34,7 @@ namespace AdvancedBot.Core.Services
                 var status = _glr.GetServerStatus().GetAwaiter().GetResult();
                 if (status.Ready)
                     newStatus = "Online";
-                else newStatus = "Offline";
+                else newStatus = "Launching";
             }
             catch (TaskCanceledException exc)
             {
