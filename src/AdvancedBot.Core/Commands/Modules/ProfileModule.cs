@@ -154,7 +154,7 @@ namespace GLR.Core.Commands.Modules
             var embed = new EmbedBuilder()
             {
                 Title = $"GLR Server Status",
-                Description = $"Servers are **online** since **{status.OnlineSince.ToLongTimeString()}** (miracle innit)",
+                Description = $"Servers have been **online** since **{status.OnlineSince.ToString()}** (miracle innit)",
                 Color = Color.Blue
             }
             .AddField("Total Commands Executed", FormatNumbers(status.TotalCommandsExecuted), true)
