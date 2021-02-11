@@ -43,8 +43,8 @@ namespace GLR.Core.Commands.Modules
                 .WithDescription($"\nThis user has ID **{profile.Id}**." +
                                 $"\n**{profile.Username}** is {displayRank}.")
                 .AddField("Friends", $"This user has **{profile.Friends.Length}** friends.")
-                .WithFooter($"Account created on {profile.CreatedAt.ToLongDateString()}")
-                .WithColor(GetColourBasedOnRank(profile.RankInfo))
+                .WithFooter($"Account created on {profile.CreatedAt.Value.ToLongDateString()}")
+                .WithColor(profile.Username == "Ezura" ? 000000 : GetColourBasedOnRank(profile.RankInfo))
                 .Build();
 
             await ReplyAsync("", false, embed);
@@ -254,10 +254,14 @@ namespace GLR.Core.Commands.Modules
                     return 480472;
                 case Rank.Administrator:
                     return 3172029;
+                case Rank.GameModerator:
+                    return 5427394;
                 case Rank.Moderator:
-                    return 2605694;
-                case Rank.Tester:
+                    return 2605694;!
+                case Rank.ContentCreator:
                     return 16729674;
+                case Rank.Tester:
+                    return 7284617;
                 case Rank.Supporter:
                     return 15710778;
                 case Rank.Locked:
@@ -332,7 +336,7 @@ namespace GLR.Core.Commands.Modules
             pieces[7] = stats.Level.ToString();
             pieces[9] = profile.Friends.Length.ToString();
             pieces[11] = stats.Starbase.ToString();
-            pieces[13] = profile.CreatedAt.ToShortDateString();
+            pieces[13] = profile.CreatedAt.Value.ToShortDateString();
             pieces[15] = stats.Status == UserStatus.Online ? "https://i.imgur.com/cuFVhuL.png" : "https://i.imgur.com/qHRoNBA.png";
             pieces[17] = stats.Status == UserStatus.Online ? "Online" : "Offline";
             pieces[19] = stats.Colonies.ToString();
