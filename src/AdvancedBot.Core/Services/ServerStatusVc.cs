@@ -36,7 +36,7 @@ namespace AdvancedBot.Core.Services
                     newStatus = "Online";
                 else newStatus = "Launching";
             }
-            catch (TaskCanceledException exc)
+            catch (Exception exc)
             {
                 newStatus = "Offline";
             }
