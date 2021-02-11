@@ -257,7 +257,7 @@ namespace GLR.Core.Commands.Modules
                 case Rank.GameModerator:
                     return 5427394;
                 case Rank.Moderator:
-                    return 2605694;!
+                    return 2605694;
                 case Rank.ContentCreator:
                     return 16729674;
                 case Rank.Tester:
