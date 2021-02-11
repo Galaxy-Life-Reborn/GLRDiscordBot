@@ -30,7 +30,7 @@ namespace AdvancedBot.Core
             {
                 CaseSensitiveCommands = false,
                 LogLevel = LogSeverity.Info,
-                BotInviteIsPrivate = true,
+                BotInviteIsPrivate = false,
                 RepositoryUrl = "https://github.com/svr333/AdvancedBot-Template"
             });
         }
