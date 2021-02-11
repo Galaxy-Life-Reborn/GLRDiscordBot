@@ -33,7 +33,8 @@ namespace GLR.Core.Commands.Modules
 
             var profile = await _client.GetUserInfo(user);
 
-            var displayRank = profile.RankInfo == Rank.Banned ? "**BANNED**" : $"a {profile.RankInfo}";
+            var displayRank = profile.RankInfo == Rank.Banned ? "**BANNED**"
+            : profile.RankInfo == Rank.Locked ? "**LOCKED**" : $"a {profile.RankInfo}";
 
             var embed = new EmbedBuilder()
                 .WithTitle($"Game profile for {profile.Username}")
