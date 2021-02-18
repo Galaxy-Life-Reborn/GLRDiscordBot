@@ -173,20 +173,19 @@ namespace GLR.Core.Commands.Modules
         {
             IList<string> displayTexts = new string[] { "Error while retrieving data." };
 
-            if (leaderboardType == "chips") displayTexts = (await _client.GetTopChipsPlayers()).Select(x => $"Chips: {x.Chips} | {x.Name}").ToArray();
-            else if (leaderboardType == "levels") displayTexts = (await _client.GetTopLevelPlayers()).Select(x => $"Level: {x.Level} | {x.Name} (exp: {FormatNumbers(x.Experience)})").ToArray();
+            if (leaderboardType == "chips") displayTexts = (await _client.GetTopChipsPlayers()).Select(x => $"**{x.Name}** ({x.Chips} <:CABGalaxy_Chip:714111537366958130>)").ToArray();
+            else if (leaderboardType == "levels") displayTexts = (await _client.GetTopLevelPlayers()).Select(x => $"**{x.Name}** ({x.Level} <:CADExperience:714553640848719912>)").ToArray();
             else throw new Exception("Wrong leaderboard type. Either choose `levels` or `chips`.");
             
             for (int i = 0; i < displayTexts.Count(); i++)
             {
-                displayTexts[i] = $"**#{i + 1}** | {displayTexts[i].Split(' ').First()}\n";
+                displayTexts[i] = $"**#{i + 1}** | {displayTexts[i]}\n";
             }
 
             var templateEmbed = new EmbedBuilder()
                                 .WithTitle($"{leaderboardType.ToUpperInvariant()} Leaderboard")
                                 .WithColor(Color.Purple)
-                                .WithAuthor("", "", "")
-                                .WithFooter($"Requested by {Context.User.Username} | {Context.User.Id}", "");
+                                .WithAuthor("", "", "");
 
             await SendPaginatedMessageAsync(displayTexts, templateEmbed);
         }

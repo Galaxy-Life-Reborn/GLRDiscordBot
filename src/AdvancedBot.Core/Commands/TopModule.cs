@@ -76,9 +76,13 @@ namespace AdvancedBot.Core.Commands
     
         public async Task<IUserMessage> SendPaginatedMessageAsync(IEnumerable<string> displayTexts, EmbedBuilder templateEmbed)
         {
+            var footer = templateEmbed.Footer == null
+                ? $"{Context.User.Username} ({Context.User.Id}) | Total Display Items: {displayTexts.Count()}"
+                : templateEmbed.Footer.Text;
+
             templateEmbed.WithTitle($"{templateEmbed.Title} | Page 1");
             templateEmbed.WithDescription(string.Join("\n", displayTexts.Take(10)));
-            templateEmbed.WithFooter($"{templateEmbed.Footer.Text}\n{Context.User.Username} ({Context.User.Id}) | Total Display Items: {displayTexts.Count()}");
+            templateEmbed.WithFooter(footer);
             
             var message = await Paginator.HandleNewPaginatedMessageAsync(Context, displayTexts, templateEmbed.Build());
             await Task.Delay(1000);    
