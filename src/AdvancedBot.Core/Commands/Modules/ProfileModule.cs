@@ -83,7 +83,7 @@ namespace GLR.Core.Commands.Modules
             await ReplyAsync("", false, new EmbedBuilder()
             {
                 Title = $"Statistics for {profile.Info.Username} ({profile.Info.Id})",
-                Url = profile.Info.ImageUrl,
+                Url = profile.Info.ProfileUrl,
                 Color = Color.DarkMagenta,
                 ThumbnailUrl = $"https://web.galaxylifereborn.com/accounts/avatars/{profile.Info.Id}.png?t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
                 Description = $"{displayAlliance}\nUser is level **{profile.Statistics.Level}**.\n\u200b"
