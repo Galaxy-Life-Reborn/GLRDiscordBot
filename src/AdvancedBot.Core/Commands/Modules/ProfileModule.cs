@@ -175,7 +175,7 @@ namespace GLR.Core.Commands.Modules
 
             if (leaderboardType == "chips") displayTexts = (await _client.GetTopChipsPlayers()).Select(x => $"Chips: {x.Chips} | {x.Name}").ToArray();
             else if (leaderboardType == "levels") displayTexts = (await _client.GetTopLevelPlayers()).Select(x => $"Level: {x.Level} | {x.Name} (exp: {FormatNumbers(x.Experience)})").ToArray();
-            else throw new Exception("Wrong leaderboard type. Either choose `levels´ or `chips`.");
+            else throw new Exception("Wrong leaderboard type. Either choose `levels` or `chips`.");
             
             for (int i = 0; i < displayTexts.Count(); i++)
             {
