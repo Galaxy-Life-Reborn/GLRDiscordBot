@@ -173,8 +173,8 @@ namespace GLR.Core.Commands.Modules
         {
             IList<string> displayTexts = new string[] { "Error while retrieving data." };
 
-            if (leaderboardType == "chips") displayTexts = (await _client.GetTopChipsPlayers()).ToArray();
-            else if (leaderboardType == "levels") displayTexts = (await _client.GetTopLevelPlayers()).ToArray();
+            if (leaderboardType == "chips") displayTexts = (await _client.GetTopChipsPlayers()).Select(x => $"Chips: {x.Chips} | {x.Name}").ToArray();
+            else if (leaderboardType == "levels") displayTexts = (await _client.GetTopLevelPlayers()).Select(x => $"Level: {x.Level} | {x.Name} (exp: {FormatNumbers(x.Experience)})").ToArray();
             else throw new Exception("Wrong leaderboard type. Either choose `levels´ or `chips`.");
             
             for (int i = 0; i < displayTexts.Count(); i++)
@@ -312,8 +312,11 @@ namespace GLR.Core.Commands.Modules
 
         private string FormatNumbers(decimal experiencePoints)
         {
+            // 1bil<
+            if (experiencePoints > 1000000000) return $"{Math.Round(experiencePoints / 1000000000, 2)}B";
+
             // 10mil< 
-            if (experiencePoints > 10000000) return $"{Math.Round(experiencePoints / 1000000, 1)}M";
+            else if (experiencePoints > 10000000) return $"{Math.Round(experiencePoints / 1000000, 1)}M";
 
             // 1mil< 
             else if (experiencePoints > 1000000) return $"{Math.Round(experiencePoints / 1000000, 2)}M";
