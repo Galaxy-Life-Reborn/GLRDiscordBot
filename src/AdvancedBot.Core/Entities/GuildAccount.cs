@@ -9,16 +9,12 @@ namespace AdvancedBot.Core.Entities
     {
         #region Properties
         public ulong Id { get; set; }
-        public List<string> Prefixes { get; set; }
+        public List<string> Prefixes { get; set; } = new List<string>() { "!" };
         public ulong ModRoleId { get; set; }
         public List<CommandSettings> Commands { get; set; }
+        public List<ChannelCounter> ChannelCounters { get; set; } = new List<ChannelCounter>();
 
         #endregion
-
-        public GuildAccount()
-        {
-            Prefixes = new List<string>() { "!" };
-        }
 
         public void RemovePrefix(string prefix)
         {

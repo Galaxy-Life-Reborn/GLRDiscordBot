@@ -28,6 +28,15 @@ namespace AdvancedBot.Core.Services.DataStorage
             }
         }
 
+        public T[] RestoreAll<T>()
+        {
+            using (var db = new LiteDatabase(_dbFileName))
+            {
+                var collection = db.GetCollection<T>();
+                return collection.FindAll().ToArray();
+            }
+        }
+
         public IEnumerable<T> RestoreMany<T>(Expression<Func<T, bool>> predicate)
         {
             using (var db = new LiteDatabase(_dbFileName))

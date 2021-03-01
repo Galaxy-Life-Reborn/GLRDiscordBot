@@ -59,7 +59,7 @@ namespace AdvancedBot.Core
         private async Task OnReadyAsync()
         {
             Console.WriteLine($"This bot is currently in {_client.Guilds.Count} servers.");
-            await _client.SetGameAsync("Being a bot.");
+            await _client.SetGameAsync("Galaxy Life Reborn");
         }
 
         private ServiceProvider ConfigureServices()
@@ -73,7 +73,7 @@ namespace AdvancedBot.Core
                 .AddSingleton<PaginatorService>()
                 .AddSingleton<GLRClient>()
                 .AddSingleton<CommandPermissionService>()
-                .AddSingleton<ServerStatusVc>()
+                .AddSingleton<ChannelCounterService>()
                 .BuildServiceProvider();
         }
     }

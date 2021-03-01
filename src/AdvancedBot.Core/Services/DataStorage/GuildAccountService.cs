@@ -17,7 +17,10 @@ namespace AdvancedBot.Core.Services.DataStorage
             _commands = commands;
         }
 
-        internal GuildAccount GetOrCreateGuildAccount(ulong id)
+        public GuildAccount[] GetAllGuilds()
+            => _storage.RestoreAll<GuildAccount>();
+
+        public GuildAccount GetOrCreateGuildAccount(ulong id)
         {
             if (!_storage.Exists<GuildAccount>(x => x.Id == id))
                 CreateGuildAccount(id);
