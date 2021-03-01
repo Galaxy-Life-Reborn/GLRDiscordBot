@@ -98,6 +98,28 @@ namespace GLR.Core.Commands.Modules
             .Build());
         }
 
+        [Command("alliance")]
+        public async Task GetAllianceAsync([Remainder]string input)
+        {
+            var alliance = await _client.GetAllianceByName(input);
+
+            if (alliance is null)
+                throw new Exception($"Could not find alliance corresponding with {input}");
+
+            var embed = new EmbedBuilder()
+            {
+                Title = $"Info for {alliance.Name}",
+                Description = $"Alliance owned by **{alliance.Owner.Name}** ({alliance.Owner.Id})\n\u200b"
+            }
+            .WithColor(Color.DarkPurple)
+            .AddField("Members", alliance.MemberCount, true)
+            .AddField("Wars Participated", 0, true)
+            .AddField("Wars won", 0, true)
+            .Build();
+
+            await ReplyAsync("", false, embed);
+        }
+
         [Command("stat", RunMode = RunMode.Async)]
         [Summary("Test stats command in the works.")]
         public async Task DisplayStatWithImage([Remainder]string user = "")
