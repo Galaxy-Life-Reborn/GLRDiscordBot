@@ -15,7 +15,7 @@ namespace AdvancedBot.Core.Services.Commands
         private DiscordSocketClient _client;
         private GLRClient _glr;
         private GuildAccountService _guild;
-        private Timer _timer = new Timer(3 * 10 * 1000);
+        private Timer _timer = new Timer(3 * 60 * 1000);
 
         public ChannelCounterService(DiscordSocketClient client, GLRClient glr, GuildAccountService guild)
         {
@@ -52,7 +52,7 @@ namespace AdvancedBot.Core.Services.Commands
             var fCounter = guild.ChannelCounters.Find(x => x.Type == counter.Type);
             var cCounter = guild.ChannelCounters.Find(x => x.ChannelId == counter.ChannelId);
 
-            if (fCounter != null)
+            if (fCounter != null || cCounter != null)
                 return false;
 
             guild.ChannelCounters.Add(counter);

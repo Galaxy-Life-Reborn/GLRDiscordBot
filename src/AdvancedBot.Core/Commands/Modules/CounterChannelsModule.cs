@@ -28,19 +28,25 @@ namespace AdvancedBot.Core.Commands.Modules
             await ReplyAsync("`flash`, `pa`");
         }
         
+        [RequireBotPermission(GuildPermission.ManageChannels)]
         [Command("setup")]
         [Summary("Sets up one counter of each type.")]
         public async Task SetupCountersAsync()
         {
             var flashChannel = await Context.Guild.CreateVoiceChannelAsync("Flash Status: Online");
+            await flashChannel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, new OverwritePermissions(connect: PermValue.Deny));
             var paChannel = await Context.Guild.CreateVoiceChannelAsync("PA Status: Online");
+            await paChannel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, new OverwritePermissions(connect: PermValue.Deny));
 
-            _counter.TryAddNewChannelCounter(Context.Guild.Id, new ChannelCounter(paChannel.Id, ChannelCounterType.PAStatus));
-            _counter.TryAddNewChannelCounter(Context.Guild.Id, new ChannelCounter(flashChannel.Id, ChannelCounterType.FlashStatus));
+            if (!_counter.TryAddNewChannelCounter(Context.Guild.Id, new ChannelCounter(paChannel.Id, ChannelCounterType.PAStatus)))
+                await paChannel.DeleteAsync();
+            if (!_counter.TryAddNewChannelCounter(Context.Guild.Id, new ChannelCounter(flashChannel.Id, ChannelCounterType.FlashStatus)))
+                await flashChannel.DeleteAsync();
 
             await ReplyAsync("Successfully set up all voice channels");
         }
 
+        [RequireBotPermission(GuildPermission.ManageChannels)]
         [Command("create")][Alias("add")]
         [Summary("Adds a counter to an existing voice channel")]
         public async Task CreateNewCounterAsync([EnsureSameGuild] IVoiceChannel channel, string input)
