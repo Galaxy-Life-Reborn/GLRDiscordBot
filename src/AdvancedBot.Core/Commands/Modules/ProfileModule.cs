@@ -113,7 +113,7 @@ namespace GLR.Core.Commands.Modules
                 Title = $"{alliance.Name}",
                 Description = $"Alliance owned by **{alliance.Owner.Name}** ({alliance.Owner.Id})\n\u200b"
             }
-            .WithAuthor("", "attachment://{emblemFileName}")
+            .WithAuthor("", $"attachment://{emblemFileName}")
             .WithColor(Color.DarkPurple)
             .WithThumbnailUrl($"attachment://{emblemFileName}")
             .AddField("Members", alliance.MemberCount, true)
