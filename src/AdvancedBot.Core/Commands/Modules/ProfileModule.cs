@@ -19,6 +19,7 @@ namespace GLR.Core.Commands.Modules
     public class ProfileModule : TopModule
     {
         private GLRClient _client;
+        private string _basePath = Directory.GetCurrentDirectory();
 
         public ProfileModule(GLRClient client)
         {
@@ -102,6 +103,7 @@ namespace GLR.Core.Commands.Modules
         public async Task GetAllianceAsync([Remainder]string input)
         {
             var alliance = await _client.GetAllianceByName(input);
+            var emblemFileName = $"flag_{(int)alliance.Emblem.Shape}_{(int)alliance.Emblem.Pattern}_{(int)alliance.Emblem.Icon}.png";
 
             if (alliance is null)
                 throw new Exception($"Could not find alliance corresponding with {input}");
@@ -112,6 +114,7 @@ namespace GLR.Core.Commands.Modules
                 Description = $"Alliance owned by **{alliance.Owner.Name}** ({alliance.Owner.Id})\n\u200b"
             }
             .WithColor(Color.DarkPurple)
+            .WithThumbnailUrl($"{_basePath}/Emblems/{emblemFileName}")
             .AddField("Members", alliance.MemberCount, true)
             .AddField("Wars Participated", 0, true)
             .AddField("Wars won", 0, true)
