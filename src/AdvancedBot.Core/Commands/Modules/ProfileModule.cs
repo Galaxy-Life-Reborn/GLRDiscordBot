@@ -109,11 +109,8 @@ namespace GLR.Core.Commands.Modules
                 throw new Exception($"Could not find alliance corresponding with {input}");
 
             var embed = new EmbedBuilder()
-            {
-                Title = $"{alliance.Name}",
-                Description = $"Alliance owned by **{alliance.Owner.Name}** ({alliance.Owner.Id})\n\u200b"
-            }
-            .WithAuthor("", $"attachment://{emblemFileName}")
+            .WithDescription($"Alliance owned by **{alliance.Owner.Name}** ({alliance.Owner.Id})\n\u200b")
+            .WithAuthor("The Elite Division", $"https://cdn.discordapp.com/emojis/639094741631369247.png?v=1")
             .WithColor(Color.DarkPurple)
             .WithThumbnailUrl($"attachment://{emblemFileName}")
             .AddField("Members", alliance.MemberCount, true)
