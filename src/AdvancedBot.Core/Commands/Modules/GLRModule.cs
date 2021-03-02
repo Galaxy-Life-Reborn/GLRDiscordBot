@@ -15,7 +15,7 @@ using UserStatus = GLR.Net.Entities.Enums.UserStatus;
 
 namespace GLR.Core.Commands.Modules
 {
-    [Name("GLR")]
+    [Name("glr")]
     public class ProfileModule : TopModule
     {
         private GLRClient _client;
@@ -138,38 +138,38 @@ namespace GLR.Core.Commands.Modules
             await SendPaginatedMessageAsync(displayTexts, templateEmbed);
         }
 
-        [Command("stat", RunMode = RunMode.Async)]
-        [Summary("Test stats command in the works.")]
-        public async Task DisplayStatWithImage([Remainder]string user = "")
-        {
-            var templateHtml = File.ReadAllText("stats/TemplateCard.html");
+        // [Command("stat", RunMode = RunMode.Async)]
+        // [Summary("Test stats command in the works.")]
+        // public async Task DisplayStatWithImage([Remainder]string user = "")
+        // {
+        //     var templateHtml = File.ReadAllText("stats/TemplateCard.html");
 
-            if (string.IsNullOrEmpty(user)) user = Context.User.Username;
+        //     if (string.IsNullOrEmpty(user)) user = Context.User.Username;
 
-            var profile = await _client.GetUserAsync(user);
+        //     var profile = await _client.GetUserAsync(user);
 
-            var newHtml = FormatHtmlForStats(templateHtml, profile.Info, profile.Statistics);
-            File.WriteAllText($"stats/{user}.html", newHtml);
+        //     var newHtml = FormatHtmlForStats(templateHtml, profile.Info, profile.Statistics);
+        //     File.WriteAllText($"stats/{user}.html", newHtml);
 
-            await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
-            var browser = await Puppeteer.LaunchAsync(new LaunchOptions
-            {
-                Args = new string[] { "--no-sandbox"},
-                Headless = true,
-                DefaultViewport = new ViewPortOptions()
-                {
-                    Width = 426,
-                    Height = 206
-                }
-            });
-            var page = await browser.NewPageAsync();
-            await page.GoToAsync($"file:///{Environment.CurrentDirectory}/stats/{user}.html");
+        //     await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultRevision);
+        //     var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+        //     {
+        //         Args = new string[] { "--no-sandbox"},
+        //         Headless = true,
+        //         DefaultViewport = new ViewPortOptions()
+        //         {
+        //             Width = 426,
+        //             Height = 206
+        //         }
+        //     });
+        //     var page = await browser.NewPageAsync();
+        //     await page.GoToAsync($"file:///{Environment.CurrentDirectory}/stats/{user}.html");
 
-            await page.ScreenshotAsync($"{Environment.CurrentDirectory}/stats/{user}.png");
-            browser.Dispose();
+        //     await page.ScreenshotAsync($"{Environment.CurrentDirectory}/stats/{user}.png");
+        //     browser.Dispose();
 
-            await Context.Channel.SendFileAsync($"stats/{user}.png");
-        }
+        //     await Context.Channel.SendFileAsync($"stats/{user}.png");
+        // }
 
         [Command("status")]
         public async Task DisplayServerStatusAsync()
