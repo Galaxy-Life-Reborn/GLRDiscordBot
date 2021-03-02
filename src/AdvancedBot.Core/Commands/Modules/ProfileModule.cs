@@ -110,17 +110,18 @@ namespace GLR.Core.Commands.Modules
 
             var embed = new EmbedBuilder()
             {
-                Title = $"Info for {alliance.Name}",
+                Title = $"{alliance.Name}",
                 Description = $"Alliance owned by **{alliance.Owner.Name}** ({alliance.Owner.Id})\n\u200b"
             }
+            .WithAuthor("", "attachment://{emblemFileName}")
             .WithColor(Color.DarkPurple)
-            .WithThumbnailUrl($"{_basePath}/Emblems/{emblemFileName}")
+            .WithThumbnailUrl($"attachment://{emblemFileName}")
             .AddField("Members", alliance.MemberCount, true)
             .AddField("Wars Participated", 0, true)
             .AddField("Wars won", 0, true)
             .Build();
 
-            await ReplyAsync("", false, embed);
+            await Context.Channel.SendFileAsync($"{_basePath}/Emblems/{emblemFileName}", embed: embed);
         }
 
         [Command("stat", RunMode = RunMode.Async)]
