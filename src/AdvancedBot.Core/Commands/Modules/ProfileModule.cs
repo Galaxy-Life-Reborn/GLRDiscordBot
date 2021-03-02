@@ -100,6 +100,7 @@ namespace GLR.Core.Commands.Modules
         }
 
         [Command("alliance")]
+        [Summary("Shows basic information about an alliance.")]
         public async Task GetAllianceAsync([Remainder]string input)
         {
             var alliance = await _client.GetAllianceByName(input);
@@ -119,6 +120,22 @@ namespace GLR.Core.Commands.Modules
             .Build();
 
             await Context.Channel.SendFileAsync($"{_basePath}/Emblems/{emblemFileName}", embed: embed);
+        }
+
+        [Command("members")]
+        [Summary("Shows all members of an alliance.")]
+        public async Task GetAllianceMembersAsync([Remainder]string input)
+        {
+            var allianceInfo = await _client.GetAllianceByName(input);
+            var allianceMembers = await _client.GetAllianceMembers(input);
+            var displayTexts = allianceMembers.Select(x => $"**{x.Name}** ({x.Id})");
+
+            var templateEmbed = new EmbedBuilder()
+                .WithTitle($"Members of {allianceInfo.Name}")
+                .WithColor(Color.Purple)
+                .WithAuthor("", "", "");
+
+            await SendPaginatedMessageAsync(displayTexts, templateEmbed);
         }
 
         [Command("stat", RunMode = RunMode.Async)]
