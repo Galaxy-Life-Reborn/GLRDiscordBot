@@ -4,6 +4,9 @@ namespace AdvancedBot.Core.Entities.Enums
     {
         None = 0,
         FlashStatus = 1,
-        PAStatus = 2
+        PAStatus = 2,
+        OnlinePlayers = 3,
+        TotalCommandsExecuted = 4,
+        MemberCount = 5
     }
 }

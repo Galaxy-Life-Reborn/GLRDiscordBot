@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using AdvancedBot.Core.Commands.Preconditions;
 using AdvancedBot.Core.Entities;
-using AdvancedBot.Core.Entities.Enums;
 using AdvancedBot.Core.Services.Commands;
 using Discord;
 using Discord.Commands;
@@ -25,7 +24,20 @@ namespace AdvancedBot.Core.Commands.Modules
         [Summary("Lists all possible counters as of now.")]
         public async Task ListAllCountersAsync()
         {
-            await ReplyAsync("`flash`, `pa`");
+            var possibleCounters = _counter.GetAllChannelCounters();
+
+            var embed = new EmbedBuilder()
+            .WithTitle("Possible Counters:")
+            .WithColor(Color.DarkGreen)
+            .WithFooter("Create one by executing !counter create <channel-id> <counter>");
+
+            /* i=1 to skip None */
+            for (int i = 1; i < possibleCounters.Length; i++)
+            {
+                embed.AddField(possibleCounters[i].Trigger.Humanize(), $"{possibleCounters[i].Description}\n\u200b");
+            }
+
+            await ReplyAsync("", false, embed.Build());
         }
         
         [RequireBotPermission(GuildPermission.ManageChannels)]
@@ -33,64 +45,57 @@ namespace AdvancedBot.Core.Commands.Modules
         [Summary("Sets up one counter of each type.")]
         public async Task SetupCountersAsync()
         {
-            var flashChannel = await Context.Guild.CreateVoiceChannelAsync("Flash Status: Online");
-            await flashChannel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, new OverwritePermissions(connect: PermValue.Deny));
-            var paChannel = await Context.Guild.CreateVoiceChannelAsync("PA Status: Online");
-            await paChannel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, new OverwritePermissions(connect: PermValue.Deny));
+            var possibleCounters = _counter.GetAllChannelCounters();
 
-            if (!_counter.TryAddNewChannelCounter(Context.Guild.Id, new ChannelCounter(paChannel.Id, ChannelCounterType.PAStatus)))
-                await paChannel.DeleteAsync();
-            if (!_counter.TryAddNewChannelCounter(Context.Guild.Id, new ChannelCounter(flashChannel.Id, ChannelCounterType.FlashStatus)))
-                await flashChannel.DeleteAsync();
+            /* i=1 to skip None */
+            for (int i = 1; i < possibleCounters.Length; i++)
+            {
+                var c = possibleCounters[i];
+                var voiceChannel = await Context.Guild.CreateVoiceChannelAsync($"{c.Trigger} counter");
+                await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, new OverwritePermissions(connect: PermValue.Deny));
 
-            await ReplyAsync("Successfully set up all voice channels");
+                try
+                {
+                    _counter.AddNewChannelCounter(Context.Guild.Id, new ChannelCounter(voiceChannel.Id, possibleCounters[i].Type));
+                }
+                catch (Exception)
+                {
+                    await voiceChannel.DeleteAsync();
+                }
+            }
+
+            await ReplyAsync("Successfully set up one of each counter." +
+            "\nPlease wait up to **3 minutes** for the counters to set up." +
+            "\n\n**TIP:** You can delete the voice channels of counters you dont want.");
         }
 
         [RequireBotPermission(GuildPermission.ManageChannels)]
         [Command("create")][Alias("add")]
         [Summary("Adds a counter to an existing voice channel")]
-        public async Task CreateNewCounterAsync([EnsureSameGuild] IVoiceChannel channel, string input)
+        public async Task CreateNewCounterAsync([EnsureSameGuild] IVoiceChannel channel, [Remainder] string input)
         {
             var type = _counter.ParseChannelCounterTypeFromInput(input);
 
-            if (_counter.TryAddNewChannelCounter(channel.Guild.Id, new ChannelCounter(channel.Id, type)))
-            {
-                await ReplyAsync($"Successfully added the **{type.Humanize()}** to the channel, it will update within 3 minutes");
-            }
-            else
-            {
-                throw new Exception($"Could not create the channel counter. Make sure it doesn't already exist.");
-            }
+            _counter.AddNewChannelCounter(channel.Guild.Id, new ChannelCounter(channel.Id, type));
+            await ReplyAsync($"Successfully added the **{type.Humanize()}** to the channel, it will update within 3 minutes");
         }
 
         [Command("remove")][Alias("delete", "destroy")]
         [Summary("Removes an existing counter.")]
-        public async Task RemoveCounterAsync(string input)
+        public async Task RemoveCounterAsync([Remainder]string input)
         {
             var type = _counter.ParseChannelCounterTypeFromInput(input);
 
-            if (_counter.TryRemoveChannelCounterByType(Context.Guild.Id, type))
-            {
-                await ReplyAsync($"Successfully removed the **{type.Humanize()}** from the channel, it will no longer update.");
-            }
-            else
-            {
-                throw new Exception($"Could not remove the counter associated with this type.");
-            }
+            _counter.RemoveChannelCounterByType(Context.Guild.Id, type);
+            await ReplyAsync($"Successfully removed the **{type.Humanize()}** from the channel, it will no longer update.");
         }
 
         [Command("remove")][Alias("delete", "destroy")]
         [Summary("Removes an existing counter.")]
-        public async Task RemoveCounterAsync(IVoiceChannel vc)
+        public async Task RemoveCounterAsync([EnsureSameGuild] IVoiceChannel vc)
         {
-            if (_counter.TryRemoveChannelCounterByChannel(Context.Guild.Id, vc.Id))
-            {
-                await ReplyAsync($"Successfully the counter from **{vc.Id}**, it will no longer update.");
-            }
-            else
-            {
-                throw new Exception($"Could not remove the counter associated with this channel.");
-            }
+            _counter.RemoveChannelCounterByChannel(Context.Guild.Id, vc.Id);
+            await ReplyAsync($"Successfully removed the counter from **{vc.Id}**, it will no longer update.");
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Timers;
@@ -7,15 +8,17 @@ using AdvancedBot.Core.Entities.Enums;
 using AdvancedBot.Core.Services.DataStorage;
 using Discord.WebSocket;
 using GLR.Net;
+using GLR.Net.Entities;
 
 namespace AdvancedBot.Core.Services.Commands
 {
     public class ChannelCounterService
     {
+        private List<ChannelCounterInfo> _activeCounters = new List<ChannelCounterInfo>();
         private DiscordSocketClient _client;
         private GLRClient _glr;
         private GuildAccountService _guild;
-        private Timer _timer = new Timer(3 * 60 * 1000);
+        private Timer _timer = new Timer(6 * 60 * 1000);
 
         public ChannelCounterService(DiscordSocketClient client, GLRClient glr, GuildAccountService guild)
         {
@@ -25,6 +28,8 @@ namespace AdvancedBot.Core.Services.Commands
 
             _timer.Start();
             _timer.Elapsed += OnTimerElapsed;
+
+            InitializeCounters();
         }
 
         private void OnTimerElapsed(object timerObj, ElapsedEventArgs e)
@@ -36,64 +41,86 @@ namespace AdvancedBot.Core.Services.Commands
             _timer.Start();
         }
 
+        public void InitializeCounters()
+        {
+            var enumValues = Enum.GetValues(typeof(ChannelCounterType)) as ChannelCounterType[];
+
+            for (int i = 0; i < enumValues.Length; i++)
+            {
+                _activeCounters.Add(new ChannelCounterInfo(enumValues[i]));
+            }
+        }
+
+        public ChannelCounterInfo[] GetAllChannelCounters()
+            => _activeCounters.ToArray();
+
         public ChannelCounterType ParseChannelCounterTypeFromInput(string input)
         {
+            input = input.ToLower();
             ChannelCounterType type;
 
-            type = input.ToLower() == "flash" ? ChannelCounterType.FlashStatus
-            : input.ToLower() == "pa" ? ChannelCounterType.PAStatus : ChannelCounterType.None;
+            type = input == "flash" ? ChannelCounterType.FlashStatus
+            : input == "pa" ? ChannelCounterType.PAStatus
+            : input == "online players" ? ChannelCounterType.OnlinePlayers
+            : input == "membercount" ? ChannelCounterType.MemberCount : ChannelCounterType.None;
 
             return type;
         }
 
-        public bool TryAddNewChannelCounter(ulong guildId, ChannelCounter counter)
+        public void AddNewChannelCounter(ulong guildId, ChannelCounter counter)
         {
+            if (counter.Type == ChannelCounterType.None)
+                throw new Exception($"Invalid counter, please run !counter list.");
+
             var guild = _guild.GetOrCreateGuildAccount(guildId);
             var fCounter = guild.ChannelCounters.Find(x => x.Type == counter.Type);
             var cCounter = guild.ChannelCounters.Find(x => x.ChannelId == counter.ChannelId);
 
-            if (fCounter != null || cCounter != null)
-                return false;
+            if (fCounter != null)
+                throw new Exception($"A counter of this type already exists. ({fCounter.ChannelId})");
+            else if (cCounter != null)
+                throw new Exception($"This channel already has the '{cCounter.Type}' active.");
+                
 
             guild.ChannelCounters.Add(counter);
             _guild.SaveGuildAccount(guild);
-            return true;
         }
 
-        public bool TryRemoveChannelCounterByType(ulong guildId, ChannelCounterType counterType)
+        public void RemoveChannelCounterByType(ulong guildId, ChannelCounterType counterType)
         {
+            if (counterType == ChannelCounterType.None)
+                throw new Exception($"Invalid counter, please run !counter list.");
+
             var guild = _guild.GetOrCreateGuildAccount(guildId);
 
             var counter = guild.ChannelCounters.Find(x => x.Type == counterType);
 
             if (counter is null)
-                return false;
+                throw new Exception($"There is no counter active of type '{counterType}'.");
             
             guild.ChannelCounters.Remove(counter);
 
             _guild.SaveGuildAccount(guild);
-            return true;
         }
 
-        public bool TryRemoveChannelCounterByChannel(ulong guildId, ulong channelId)
+        public void RemoveChannelCounterByChannel(ulong guildId, ulong channelId)
         {
             var guild = _guild.GetOrCreateGuildAccount(guildId);
 
             var counter = guild.ChannelCounters.Find(x => x.ChannelId == channelId);
 
             if (counter is null)
-                return false;
+                throw new Exception($"This channel has no active counter.");
             
             guild.ChannelCounters.Remove(counter);
 
             _guild.SaveGuildAccount(guild);
-            return true;
         }
 
         private void HandleActiveChannelCounters()
         {
             var guilds = _guild.GetAllGuilds();
-            string flashStatus = GetFlashStatus();
+            var flashInfo = GetFlashServerInfo();
             string paStatus = GetPaStatus();
 
             for (int i = 0; i < guilds.Length; i++)
@@ -118,14 +145,29 @@ namespace AdvancedBot.Core.Services.Commands
                     switch (guilds[i].ChannelCounters[j].Type)
                     {
                         case ChannelCounterType.FlashStatus:
-                            string newName = $"Flash Status: {flashStatus}";
+                            string newName = $"Flash Status: {flashInfo.ServerStatus}";
                             if (channel.Name != newName)
                                 channel.ModifyAsync(x => x.Name = newName);
                             break;
                         case ChannelCounterType.PAStatus:
-                            string newChannelName = $"PA Status: {paStatus}";
-                            if (channel.Name != newChannelName)
-                                channel.ModifyAsync(x => x.Name = newChannelName);
+                            string newName1 = $"PA Status: {paStatus}";
+                            if (channel.Name != newName1)
+                                channel.ModifyAsync(x => x.Name = newName1);
+                            break;
+                        case ChannelCounterType.OnlinePlayers:
+                            string newName2 = $"Flash Players: {flashInfo.OnlinePlayers}";
+                            if (channel.Name != newName2)
+                                channel.ModifyAsync(x => x.Name = newName2);
+                            break;
+                        case ChannelCounterType.TotalCommandsExecuted:
+                            string newName3 = $"Game Cmds: {flashInfo.TotalCommandsExecuted}";
+                            if (channel.Name != newName3)
+                                channel.ModifyAsync(x => x.Name = newName3);
+                            break;
+                        case ChannelCounterType.MemberCount:
+                            string newName4 = $"MemberCount: {guild.MemberCount}";
+                            if (channel.Name != newName4)
+                                channel.ModifyAsync(x => x.Name = newName4);
                             break;
                         default:
                             break;
@@ -134,13 +176,14 @@ namespace AdvancedBot.Core.Services.Commands
             }
         }
 
-        private string GetFlashStatus()
+        private FlashServerInfo GetFlashServerInfo()
         {
             var newStatus = "Offline";
+            var status = new ServerStatus();
 
             try
             {
-                var status = _glr.GetServerStatus().GetAwaiter().GetResult();
+                status = _glr.GetServerStatus().GetAwaiter().GetResult();
                 if (status.Ready)
                     newStatus = "Online";
                 else newStatus = "Launching";
@@ -150,7 +193,12 @@ namespace AdvancedBot.Core.Services.Commands
                 newStatus = "Offline";
             }
 
-            return newStatus;
+            return new FlashServerInfo
+            {
+                ServerStatus = newStatus,
+                OnlinePlayers = status.OnlinePlayers,
+                TotalCommandsExecuted = status.TotalCommandsExecuted
+            };
         }
     
         private string GetPaStatus()
