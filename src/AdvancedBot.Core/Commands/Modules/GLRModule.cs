@@ -172,6 +172,7 @@ namespace GLR.Core.Commands.Modules
         // }
 
         [Command("status")]
+        [Summary("Shows the current status of the flash servers.")]
         public async Task DisplayServerStatusAsync()
         {
             ServerStatus status = null;
