@@ -59,19 +59,16 @@ namespace AdvancedBot.Core.Services.Commands
             input = input.ToLower();
             ChannelCounterType type;
 
-            type = input == "flash" ? ChannelCounterType.FlashStatus
-            : input == "pa" ? ChannelCounterType.PAStatus
-            : input == "online players" ? ChannelCounterType.OnlinePlayers
-            : input == "membercount" ? ChannelCounterType.MemberCount : ChannelCounterType.None;
+            var counter = _activeCounters.Find(x => x.Trigger == input);
 
-            return type;
+            if (counter is null)
+                throw new Exception($"'{input}' is an invalid counter, please run !counter list.");
+
+            return counter.Type;
         }
 
         public void AddNewChannelCounter(ulong guildId, ChannelCounter counter)
         {
-            if (counter.Type == ChannelCounterType.None)
-                throw new Exception($"Invalid counter, please run !counter list.");
-
             var guild = _guild.GetOrCreateGuildAccount(guildId);
             var fCounter = guild.ChannelCounters.Find(x => x.Type == counter.Type);
             var cCounter = guild.ChannelCounters.Find(x => x.ChannelId == counter.ChannelId);
@@ -88,9 +85,6 @@ namespace AdvancedBot.Core.Services.Commands
 
         public void RemoveChannelCounterByType(ulong guildId, ChannelCounterType counterType)
         {
-            if (counterType == ChannelCounterType.None)
-                throw new Exception($"Invalid counter, please run !counter list.");
-
             var guild = _guild.GetOrCreateGuildAccount(guildId);
 
             var counter = guild.ChannelCounters.Find(x => x.Type == counterType);
@@ -173,6 +167,8 @@ namespace AdvancedBot.Core.Services.Commands
                             break;
                     }
                 }
+
+                Console.WriteLine($"Updated all active counters.");
             }
         }
 

@@ -28,6 +28,7 @@ namespace AdvancedBot.Core.Entities
                     Description = "Shows the current amount of in-game flash players.";
                     break;
                 case ChannelCounterType.TotalCommandsExecuted:
+                    Trigger = "commands";
                     Description = "Shows the current amount of executed commands.";
                     break;
                 case ChannelCounterType.MemberCount:

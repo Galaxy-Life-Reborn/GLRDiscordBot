@@ -53,6 +53,7 @@ namespace AdvancedBot.Core.Commands.Modules
             {
                 var c = possibleCounters[i];
                 var voiceChannel = await Context.Guild.CreateVoiceChannelAsync($"{c.Trigger} counter");
+                await voiceChannel.AddPermissionOverwriteAsync(Context.Client.CurrentUser, new OverwritePermissions(connect: PermValue.Allow));
                 await voiceChannel.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, new OverwritePermissions(connect: PermValue.Deny));
 
                 try
@@ -66,18 +67,31 @@ namespace AdvancedBot.Core.Commands.Modules
             }
 
             await ReplyAsync("Successfully set up one of each counter." +
-            "\nPlease wait up to **3 minutes** for the counters to set up." +
+            "\nPlease wait up to **6 minutes** for the counters to set up." +
             "\n\n**TIP:** You can delete the voice channels of counters you dont want.");
         }
 
-        [Command("create")][Alias("add")]
+        [Command("create")]
+        [Summary("Creates a new voice channel with this counter.")]
+        public async Task CreateNewCounterAsync([Remainder] string input)
+        {
+            var type = _counter.ParseChannelCounterTypeFromInput(input);
+            var vc = await Context.Guild.CreateVoiceChannelAsync($"{type.Humanize()} counter");
+            await vc.AddPermissionOverwriteAsync(Context.Client.CurrentUser, new OverwritePermissions(connect: PermValue.Allow));
+            await vc.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, new OverwritePermissions(connect: PermValue.Deny));
+
+            _counter.AddNewChannelCounter(Context.Guild.Id, new ChannelCounter(vc.Id, type));
+            await ReplyAsync($"Successfully created a new channel with the **{type.Humanize()}** counter, it will update within 6 minutes.");
+        }
+
+        [Alias("add")]
         [Summary("Adds a counter to an existing voice channel")]
         public async Task CreateNewCounterAsync([EnsureSameGuild] IVoiceChannel channel, [Remainder] string input)
         {
             var type = _counter.ParseChannelCounterTypeFromInput(input);
 
             _counter.AddNewChannelCounter(channel.Guild.Id, new ChannelCounter(channel.Id, type));
-            await ReplyAsync($"Successfully added the **{type.Humanize()}** to the channel, it will update within 3 minutes");
+            await ReplyAsync($"Successfully added the **{type.Humanize()}** to the channel, it will update within 6 minutes.");
         }
 
         [Command("remove")][Alias("delete", "destroy")]
