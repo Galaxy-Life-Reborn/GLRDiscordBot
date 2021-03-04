@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AdvancedBot.Core.Commands.Preconditions;
 using AdvancedBot.Core.Entities;
 using AdvancedBot.Core.Services.Commands;
+using AdvancedBot.Core.Services.DataStorage;
 using Discord;
 using Discord.Commands;
 using Humanizer;
@@ -14,10 +15,12 @@ namespace AdvancedBot.Core.Commands.Modules
     public class CounterChannelsModule : TopModule
     {
         private ChannelCounterService _counter;
+        private GuildAccountService _guilds;
 
-        public CounterChannelsModule(ChannelCounterService counter)
+        public CounterChannelsModule(ChannelCounterService counter, GuildAccountService guilds)
         {
             _counter = counter;
+            _guilds = guilds;
         }
 
         [Command("list")]
@@ -110,6 +113,32 @@ namespace AdvancedBot.Core.Commands.Modules
         {
             _counter.RemoveChannelCounterByChannel(Context.Guild.Id, vc.Id);
             await ReplyAsync($"Successfully removed the counter from **{vc.Id}**, it will no longer update.");
+        }
+    
+        [RequireBotPermission(GuildPermission.ManageChannels)]
+        [RequireBotPermission(GuildPermission.ManageRoles)]
+        [Command("reset")]
+        [Summary("Resets all existing counters.")]
+        public async Task ResetCountersAsync()
+        {
+            var guild = _guilds.GetOrCreateGuildAccount(Context.Guild.Id);
+
+            for (int i = 0; i < guild.ChannelCounters.Count; i++)
+            {
+                try
+                {
+                    _counter.RemoveChannelCounterByChannel(guild.Id, guild.ChannelCounters[i].ChannelId);
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+
+                await Context.Guild.GetVoiceChannel(guild.ChannelCounters[i].ChannelId).DeleteAsync();
+            }
+
+            _guilds.SaveGuildAccount(guild);
+            await ReplyAsync($"Successfully deleted all active counters.");
         }
     }
 }
