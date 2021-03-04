@@ -74,7 +74,7 @@ namespace AdvancedBot.Core.Services.Commands
             var cCounter = guild.ChannelCounters.Find(x => x.ChannelId == counter.ChannelId);
 
             if (fCounter != null)
-                throw new Exception($"A counter of this type already exists. ({fCounter.ChannelId})");
+                throw new Exception($"A counter of this type already exists. (channel id: {fCounter.ChannelId})");
             else if (cCounter != null)
                 throw new Exception($"This channel already has the '{cCounter.Type}' active.");
                 

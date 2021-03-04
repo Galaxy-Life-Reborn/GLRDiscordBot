@@ -84,7 +84,7 @@ namespace AdvancedBot.Core.Commands.Modules
             await ReplyAsync($"Successfully created a new channel with the **{type.Humanize()}** counter, it will update within 6 minutes.");
         }
 
-        [Alias("add")]
+        [Command("add")]
         [Summary("Adds a counter to an existing voice channel")]
         public async Task CreateNewCounterAsync([EnsureSameGuild] IVoiceChannel channel, [Remainder] string input)
         {
