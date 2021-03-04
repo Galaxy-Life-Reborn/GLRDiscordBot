@@ -167,9 +167,9 @@ namespace AdvancedBot.Core.Services.Commands
                             break;
                     }
                 }
-
-                Console.WriteLine($"Updated all active counters.");
             }
+            
+            Console.WriteLine($"Updated all active counters.");
         }
 
         private FlashServerInfo GetFlashServerInfo()
