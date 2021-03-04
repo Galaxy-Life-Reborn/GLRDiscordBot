@@ -174,19 +174,19 @@ namespace AdvancedBot.Core.Services.Commands
 
         private FlashServerInfo GetFlashServerInfo()
         {
-            var newStatus = "Offline";
+            var newStatus = "🔴";
             var status = new ServerStatus();
 
             try
             {
                 status = _glr.GetServerStatus().GetAwaiter().GetResult();
                 if (status.Ready)
-                    newStatus = "Online";
-                else newStatus = "Launching";
+                    newStatus = "🟢";
+                else newStatus = "🟠";
             }
             catch (Exception exc)
             {
-                newStatus = "Offline";
+                newStatus = "🔴";
             }
 
             return new FlashServerInfo
@@ -199,16 +199,16 @@ namespace AdvancedBot.Core.Services.Commands
     
         private string GetPaStatus()
         {
-            var newStatus = "Offline";
+            var newStatus = "🔴";
 
             try
             {
                 var test = new HttpClient().GetAsync("http://pa.galaxylifereborn.com/star/status").GetAwaiter().GetResult();
-                newStatus = "Online";
+                newStatus = "🟢";
             }
             catch (Exception exc)
             {
-                newStatus = "Offline";
+                newStatus = "🔴";
             }
 
             return newStatus;
