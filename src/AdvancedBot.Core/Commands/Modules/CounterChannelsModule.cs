@@ -41,6 +41,7 @@ namespace AdvancedBot.Core.Commands.Modules
         }
         
         [RequireBotPermission(GuildPermission.ManageChannels)]
+        [RequireBotPermission(GuildPermission.ManageRoles)]
         [Command("setup")]
         [Summary("Sets up one counter of each type.")]
         public async Task SetupCountersAsync()
@@ -69,7 +70,6 @@ namespace AdvancedBot.Core.Commands.Modules
             "\n\n**TIP:** You can delete the voice channels of counters you dont want.");
         }
 
-        [RequireBotPermission(GuildPermission.ManageChannels)]
         [Command("create")][Alias("add")]
         [Summary("Adds a counter to an existing voice channel")]
         public async Task CreateNewCounterAsync([EnsureSameGuild] IVoiceChannel channel, [Remainder] string input)
