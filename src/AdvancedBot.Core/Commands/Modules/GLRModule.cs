@@ -117,6 +117,7 @@ namespace GLR.Core.Commands.Modules
             .AddField("Members", alliance.MemberCount, true)
             .AddField("Wars Participated", 0, true)
             .AddField("Wars won", 0, true)
+            .WithFooter($"Run !members {input} to see its members.")
             .Build();
 
             await Context.Channel.SendFileAsync($"{_basePath}/Emblems/{emblemFileName}", embed: embed);

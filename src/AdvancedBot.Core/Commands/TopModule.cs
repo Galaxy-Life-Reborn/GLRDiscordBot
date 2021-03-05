@@ -76,6 +76,10 @@ namespace AdvancedBot.Core.Commands
     
         public async Task<IUserMessage> SendPaginatedMessageAsync(IEnumerable<string> displayTexts, EmbedBuilder templateEmbed)
         {
+            var user = Context.Guild.GetUser(Context.Client.CurrentUser.Id);
+            if (user.GuildPermissions.Has(GuildPermission.ManageMessages))
+                throw new Exception($"The bot needs 'Manage Messages' Guild Permission for this command.");
+
             var footer = templateEmbed.Footer == null
                 ? $"{Context.User.Username} ({Context.User.Id}) | Total Display Items: {displayTexts.Count()}"
                 : templateEmbed.Footer.Text;
