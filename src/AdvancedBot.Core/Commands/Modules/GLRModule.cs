@@ -61,7 +61,7 @@ namespace GLR.Core.Commands.Modules
 
             if (profile.Friends is null) await ReplyAsync("User doesn't have any friends!");
             
-            var displayTexts = profile.Friends.Select(x => $"**{x.Username}** ({x.Id})");
+            var displayTexts = profile.Friends.Select(x => $"**{x.Username}**");
 
             var templateEmbed = new EmbedBuilder()
                                 .WithTitle($"Friends for {profile.Username}")
@@ -128,7 +128,7 @@ namespace GLR.Core.Commands.Modules
         {
             var allianceInfo = await _client.GetAllianceByName(input);
             var allianceMembers = await _client.GetAllianceMembers(input);
-            var displayTexts = allianceMembers.Select(x => $"**{x.Name}** ({x.Id})");
+            var displayTexts = allianceMembers.Select(x => $"**{x.Name}**");
 
             var templateEmbed = new EmbedBuilder()
                 .WithTitle($"Members of {allianceInfo.Name}")
