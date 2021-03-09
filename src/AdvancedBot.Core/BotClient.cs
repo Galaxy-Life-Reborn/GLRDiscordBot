@@ -31,7 +31,8 @@ namespace AdvancedBot.Core
                 CaseSensitiveCommands = false,
                 LogLevel = LogSeverity.Info,
                 BotInviteIsPrivate = false,
-                RepositoryUrl = "https://github.com/Galaxy-Life-Reborn/GLRDiscordBot/wiki"
+                RepositoryUrl = "https://github.com/Galaxy-Life-Reborn/GLRDiscordBot",
+                DocumentationUrl = "https://github.com/Galaxy-Life-Reborn/GLRDiscordBot/wiki"
             });
         }
 
