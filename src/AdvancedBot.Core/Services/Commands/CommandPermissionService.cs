@@ -17,60 +17,60 @@ namespace AdvancedBot.Core.Services.Commands
         {
             var result = _commands.AdvancedSearch(input);
 
-            if (result.Key is null)            
-                guild.EnableCommand(_commands.FormatCommandName(result.Value));
+            if (result.Module is null)            
+                guild.EnableCommand(_commands.FormatCommandName(result.Command));
             else
-                EnableEntireModuleInGuild(guild, result.Key);
+                EnableEntireModuleInGuild(guild, result.Module);
         }
 
         public void DisableGuildCommandOrModule(GuildAccount guild, string input)
         {
             var result = _commands.AdvancedSearch(input);
 
-            if (result.Key is null)            
-                guild.DisableCommand(_commands.FormatCommandName(result.Value));
+            if (result.Module is null)            
+                guild.DisableCommand(_commands.FormatCommandName(result.Command));
             else
-                DisableEntireModuleInGuild(guild, result.Key);
+                DisableEntireModuleInGuild(guild, result.Module);
         }
 
         public void EnableWhitelistForCommandOrModule(GuildAccount guild, string input, bool isChannel)
         {
             var result = _commands.AdvancedSearch(input);
 
-            if (result.Key is null)            
-                guild.EnableWhitelist(_commands.FormatCommandName(result.Value), isChannel);
+            if (result.Module is null)            
+                guild.EnableWhitelist(_commands.FormatCommandName(result.Command), isChannel);
             else
-                EnableWhitelistForModule(guild, result.Key, isChannel);
+                EnableWhitelistForModule(guild, result.Module, isChannel);
         }
 
         public void DisableWhitelistForCommandOrModule(GuildAccount guild, string input, bool isChannel)
         {
             var result = _commands.AdvancedSearch(input);
 
-            if (result.Key is null)            
-                guild.DisableWhitelist(_commands.FormatCommandName(result.Value), isChannel);
+            if (result.Module is null)            
+                guild.DisableWhitelist(_commands.FormatCommandName(result.Command), isChannel);
             else
-                DisableWhitelistForModule(guild, result.Key, isChannel);
+                DisableWhitelistForModule(guild, result.Module, isChannel);
         }
 
         public void AddIdToWhitelistForCommandOrModule(GuildAccount guild, string input, ulong id, bool isChannel)
         {
             var result = _commands.AdvancedSearch(input);
 
-            if (result.Key is null)            
-                guild.AddToWhitelist(_commands.FormatCommandName(result.Value), id, isChannel);
+            if (result.Module is null)            
+                guild.AddToWhitelist(_commands.FormatCommandName(result.Command), id, isChannel);
             else
-                AddIdToWhitelistForModule(guild, result.Key, id, isChannel);
+                AddIdToWhitelistForModule(guild, result.Module, id, isChannel);
         }
 
         public void RemoveIdFromWhitelistForCommandOrModule(GuildAccount guild, string input, ulong id, bool isChannel)
         {
             var result = _commands.AdvancedSearch(input);
 
-            if (result.Key is null)            
-                guild.RemoveFromWhitelist(_commands.FormatCommandName(result.Value), id, isChannel);
+            if (result.Module is null)            
+                guild.RemoveFromWhitelist(_commands.FormatCommandName(result.Command), id, isChannel);
             else
-                RemoveIdFromWhitelistForModule(guild, result.Key, id, isChannel);
+                RemoveIdFromWhitelistForModule(guild, result.Module, id, isChannel);
         }
 
         private void EnableEntireModuleInGuild(GuildAccount guild, ModuleInfo module)

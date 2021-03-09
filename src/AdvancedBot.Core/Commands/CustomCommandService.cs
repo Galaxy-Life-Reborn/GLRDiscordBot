@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AdvancedBot.Core.Entities;
 using AdvancedBot.Core.Services;
 using Discord;
 using Discord.Commands;
@@ -102,10 +103,10 @@ namespace AdvancedBot.Core.Commands
             };
         }
 
-        public KeyValuePair<ModuleInfo, CommandInfo> AdvancedSearch(string input)
+        public AdvancedSearchResult AdvancedSearch(string input)
         {
             input = input.ToLower();
-            var result = new Dictionary<ModuleInfo, CommandInfo>();
+            var result = new AdvancedSearchResult();
 
             var allCommandAliases = ListAllCommandAliases();
             var possibleCommand = allCommandAliases.FirstOrDefault(x => x == input);
@@ -117,18 +118,18 @@ namespace AdvancedBot.Core.Commands
             {
                 var module = Modules.FirstOrDefault(x => x.Aliases.Contains(possibleModule));
                 if (module is null) module = Modules.FirstOrDefault(x => x.Name == possibleModule);
-                result.Add(module, null);
+                result = new AdvancedSearchResult(module, null);
             }
 
             else if (!string.IsNullOrEmpty(possibleCommand))
             {
                 var cmd = Commands.FirstOrDefault(x => x.Aliases.Contains(possibleCommand));
-                result.Add(null, cmd);
+                result = new AdvancedSearchResult(null, cmd);
             }     
 
             else throw new Exception("Could not find a category or command for the given input.");
 
-            return result.FirstOrDefault();
+            return result;
         }
 
         public string AllCommandsToString()

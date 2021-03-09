@@ -20,9 +20,9 @@ namespace AdvancedBot.Core.Commands.Modules
             var result = Commands.AdvancedSearch(input);
             EmbedBuilder embed;
 
-            if (result.Value is null)
-                embed = Commands.CreateModuleInfoEmbed(result.Key);
-            else embed = Commands.CreateCommandInfoEmbed(result.Value);
+            if (result.Command is null)
+                embed = Commands.CreateModuleInfoEmbed(result.Module);
+            else embed = Commands.CreateCommandInfoEmbed(result.Command);
 
             await ReplyAsync("", false, embed.Build());
         }
