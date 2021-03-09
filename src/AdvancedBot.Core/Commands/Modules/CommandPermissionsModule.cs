@@ -76,7 +76,7 @@ namespace AdvancedBot.Core.Commands.Modules
                 var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
 
                 var cmd = guild.Commands.Find(x => x.Name == formattedName);
-                var roleList = cmd.WhitelistedRoles.Count == 0 
+                var roleList = !cmd.WhitelistedRoles.Any()
                             ? $"No roles have been put on the list."
                             : $"**Roles:** <#{string.Join("> <#", cmd.WhitelistedRoles)}>";
 
@@ -148,9 +148,9 @@ namespace AdvancedBot.Core.Commands.Modules
                 var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
 
                 var cmd = guild.Commands.Find(x => x.Name == formattedName);
-                var channelList = cmd.WhitelistedRoles.Count == 0 
+                var channelList = !cmd.WhitelistedRoles.Any()
                             ? $"No channels have been put on the list."
-                            : $"**Channels:**<#{string.Join("> <#", cmd.WhitelistedChannels)}>";
+                            : $"**Channels:** <#{string.Join("> <#", cmd.WhitelistedChannels)}>";
 
                 await ReplyAsync($"**Info for {cmd.Name} regarding channels.**\n" + 
                                 $"Blacklist enabled: `{cmd.ChannelListIsBlacklist}`.\n" +
