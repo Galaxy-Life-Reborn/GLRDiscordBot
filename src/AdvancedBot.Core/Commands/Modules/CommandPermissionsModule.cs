@@ -17,26 +17,26 @@ namespace AdvancedBot.Core.Commands.Modules
 
         [Command("enable")]
         [Summary("Enables a command or a category.")]
-        public async Task EnableCommandOrModuleAsync([Remainder]string input)
+        public async Task EnableCommandOrModuleAsync([Remainder]string commandName)
         {
             var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
 
-            Permissions.EnableGuildCommandOrModule(guild, input);
+            Permissions.EnableGuildCommandOrModule(guild, commandName);
   
             Accounts.SaveGuildAccount(guild);
-            await ReplyAsync($"Successfully enabled all commands associated with `{input}`");
+            await ReplyAsync($"Successfully enabled all commands associated with `{commandName}`");
         }
 
         [Command("disable")]
         [Summary("Disables a command or module.")]
-        public async Task DisableCommandAsync([Remainder]string input)
+        public async Task DisableCommandAsync([Remainder]string commandName)
         {
             var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
 
-            Permissions.DisableGuildCommandOrModule(guild, input);
+            Permissions.DisableGuildCommandOrModule(guild, commandName);
            
             Accounts.SaveGuildAccount(guild);
-            await ReplyAsync($"Successfully disabled all commands associated with `{input}`.");
+            await ReplyAsync($"Successfully disabled all commands associated with `{commandName}`.");
         }
 
         [Command("modrole")]
@@ -87,35 +87,35 @@ namespace AdvancedBot.Core.Commands.Modules
 
             [Command("enable")][Alias("whitelist")][Priority(1)]
             [Summary("Enables whitelist and disables blacklist for roles for a certain command.")]
-            public async Task EnableWhitelistAsync([Remainder] string input)
+            public async Task EnableWhitelistAsync([Remainder] string commandName)
             {
                 var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
 
-                Permissions.EnableWhitelistForCommandOrModule(guild, input, false);
+                Permissions.EnableWhitelistForCommandOrModule(guild, commandName, false);
 
                 Accounts.SaveGuildAccount(guild);
-                await ReplyAsync($"Successfully enabled roles whitelist for `{input}`.");
+                await ReplyAsync($"Successfully enabled roles whitelist for `{commandName}`.");
             }
 
             [Command("disable")][Alias("blacklist")][Priority(1)]
             [Summary("Disables whitelist and enables blacklist for roles for a certain command.")]
-            public async Task EnableBlacklistAsync([Remainder] string input)
+            public async Task EnableBlacklistAsync([Remainder] string commandName)
             {
                 var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
 
-                Permissions.DisableWhitelistForCommandOrModule(guild, input, false);
+                Permissions.DisableWhitelistForCommandOrModule(guild, commandName, false);
 
                 Accounts.SaveGuildAccount(guild);
-                await ReplyAsync($"Successfully enabled roles blacklist for `{input}`.");
+                await ReplyAsync($"Successfully enabled roles blacklist for `{commandName}`.");
             }
 
             [Command("add")][Priority(1)]
             [Summary("Adds a role to the white/blacklist.")]
-            public async Task AddChannelToListAsync(SocketRole role, [Remainder] string input)
+            public async Task AddChannelToListAsync(SocketRole role, [Remainder] string commandName)
             {
                 var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
 
-                Permissions.AddIdToWhitelistForCommandOrModule(guild, input, role.Id, false);
+                Permissions.AddIdToWhitelistForCommandOrModule(guild, commandName, role.Id, false);
 
                 Accounts.SaveGuildAccount(guild);
                 await ReplyAsync($"Succesfully added {role.Mention} to the list.");
@@ -123,11 +123,11 @@ namespace AdvancedBot.Core.Commands.Modules
 
             [Command("remove")][Priority(1)]
             [Summary("Removes a role from the white/blacklist")]
-            public async Task RemoveChannelFromListAsync(SocketRole role, [Remainder] string input)
+            public async Task RemoveChannelFromListAsync(SocketRole role, [Remainder] string commandName)
             {
                 var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
 
-                Permissions.RemoveIdFromWhitelistForCommandOrModule(guild, input, role.Id, false);
+                Permissions.RemoveIdFromWhitelistForCommandOrModule(guild, commandName, role.Id, false);
 
                 Accounts.SaveGuildAccount(guild);
                 await ReplyAsync($"Succesfully removed {role.Mention} from the list.");
@@ -159,50 +159,50 @@ namespace AdvancedBot.Core.Commands.Modules
 
             [Command("enable")][Alias("whitelist")][Priority(1)]
             [Summary("Enables whitelist and disables blacklist for channels for a certain command.")]
-            public async Task EnableWhitelistAsync([Remainder]string input)
+            public async Task EnableWhitelistAsync([Remainder]string commandName)
             {
                 var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
 
-                Permissions.EnableWhitelistForCommandOrModule(guild, input, true);
+                Permissions.EnableWhitelistForCommandOrModule(guild, commandName, true);
 
                 Accounts.SaveGuildAccount(guild);
-                await ReplyAsync($"Successfully enabled channels whitelist for `{input}`.");
+                await ReplyAsync($"Successfully enabled channels whitelist for `{commandName}`.");
             }
 
             [Command("disable")][Alias("blacklist")][Priority(1)]
             [Summary("Disables whitelist and enables blacklist for said command.")]
-            public async Task EnableBlacklistAsync([Remainder]string input)
+            public async Task EnableBlacklistAsync([Remainder]string commandName)
             {
                 var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
 
-                Permissions.DisableWhitelistForCommandOrModule(guild, input, true);
+                Permissions.DisableWhitelistForCommandOrModule(guild, commandName, true);
 
                 Accounts.SaveGuildAccount(guild);
-                await ReplyAsync($"Successfully enabled channels blacklist for `{input}`.");
+                await ReplyAsync($"Successfully enabled channels blacklist for `{commandName}`.");
             }
 
             [Command("add")][Priority(1)]
             [Summary("Adds a channel to the white/blacklist.")]
-            public async Task AddChannelToListAsync(SocketTextChannel channel, [Remainder] string input)
+            public async Task AddChannelToListAsync(SocketTextChannel channel, [Remainder] string commandName)
             {
                 var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
 
-                Permissions.AddIdToWhitelistForCommandOrModule(guild, input, channel.Id, true);
+                Permissions.AddIdToWhitelistForCommandOrModule(guild, commandName, channel.Id, true);
 
                 Accounts.SaveGuildAccount(guild);
-                await ReplyAsync($"Succesfully added {channel.Mention} to the list for `{input}`.");
+                await ReplyAsync($"Succesfully added {channel.Mention} to the list for `{commandName}`.");
             }
 
             [Command("remove")][Priority(1)]
             [Summary("Removes a channel from the white/blacklist")]
-            public async Task RemoveChannelFromListAsync(SocketTextChannel channel, [Remainder] string input)
+            public async Task RemoveChannelFromListAsync(SocketTextChannel channel, [Remainder] string commandName)
             {
                 var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
 
-                Permissions.AddIdToWhitelistForCommandOrModule(guild, input, channel.Id, true);
+                Permissions.AddIdToWhitelistForCommandOrModule(guild, commandName, channel.Id, true);
 
                 Accounts.SaveGuildAccount(guild);
-                await ReplyAsync($"Succesfully removed {channel.Mention} from the list for `{input}`.");
+                await ReplyAsync($"Succesfully removed {channel.Mention} from the list for `{commandName}`.");
             }
         }
     }
