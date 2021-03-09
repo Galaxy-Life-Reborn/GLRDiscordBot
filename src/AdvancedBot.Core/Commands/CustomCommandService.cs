@@ -123,7 +123,7 @@ namespace AdvancedBot.Core.Commands
             else if (!string.IsNullOrEmpty(possibleCommand))
             {
                 var cmd = Commands.FirstOrDefault(x => x.Aliases.Contains(possibleCommand));
-                result.Add(cmd.Module, cmd);
+                result.Add(null, cmd);
             }     
 
             else throw new Exception("Could not find a category or command for the given input.");
