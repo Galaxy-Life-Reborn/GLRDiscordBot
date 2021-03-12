@@ -104,10 +104,11 @@ namespace GLR.Core.Commands.Modules
         public async Task GetAllianceAsync([Remainder]string input)
         {
             var alliance = await _client.GetAllianceByName(input);
-            var emblemFileName = $"flag_{(int)alliance.Emblem.Shape}_{(int)alliance.Emblem.Pattern}_{(int)alliance.Emblem.Icon}.png";
 
             if (alliance is null)
                 throw new Exception($"Could not find alliance corresponding with {input}");
+
+            var emblemFileName = $"flag_{(int)alliance.Emblem.Shape}_{(int)alliance.Emblem.Pattern}_{(int)alliance.Emblem.Icon}.png";
 
             var embed = new EmbedBuilder()
             .WithTitle(alliance.Name)
