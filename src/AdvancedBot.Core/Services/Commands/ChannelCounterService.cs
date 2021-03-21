@@ -144,7 +144,7 @@ namespace AdvancedBot.Core.Services.Commands
                                 channel.ModifyAsync(x => x.Name = newName);
                             break;
                         case ChannelCounterType.PAStatus:
-                            string newName1 = $"PA Status: {paStatus}";
+                            string newName1 = $"Mobile Status: {paStatus}";
                             if (channel.Name != newName1)
                                 channel.ModifyAsync(x => x.Name = newName1);
                             break;
@@ -154,12 +154,12 @@ namespace AdvancedBot.Core.Services.Commands
                                 channel.ModifyAsync(x => x.Name = newName2);
                             break;
                         case ChannelCounterType.TotalCommandsExecuted:
-                            string newName3 = $"Game Cmds: {flashInfo.TotalCommandsExecuted}";
+                            string newName3 = $"Game Commands: {flashInfo.TotalCommandsExecuted}";
                             if (channel.Name != newName3)
                                 channel.ModifyAsync(x => x.Name = newName3);
                             break;
                         case ChannelCounterType.MemberCount:
-                            string newName4 = $"MemberCount: {guild.MemberCount}";
+                            string newName4 = $"Discord Members: {guild.MemberCount}";
                             if (channel.Name != newName4)
                                 channel.ModifyAsync(x => x.Name = newName4);
                             break;
