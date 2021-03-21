@@ -83,7 +83,16 @@ namespace AdvancedBot.Core.Commands.Modules
             await vc.AddPermissionOverwriteAsync(Context.Client.CurrentUser, new OverwritePermissions(connect: PermValue.Allow));
             await vc.AddPermissionOverwriteAsync(Context.Guild.EveryoneRole, new OverwritePermissions(connect: PermValue.Deny));
 
-            _counter.AddNewChannelCounter(Context.Guild.Id, new ChannelCounter(vc.Id, type));
+            try
+            {
+                _counter.AddNewChannelCounter(Context.Guild.Id, new ChannelCounter(vc.Id, type));
+            }
+            catch (System.Exception e)
+            {
+                await vc.DeleteAsync();
+                throw e;
+            }
+            
             await ReplyAsync($"Successfully created a new channel with the **{type.Humanize()}** counter, it will update within 6 minutes.");
         }
 
