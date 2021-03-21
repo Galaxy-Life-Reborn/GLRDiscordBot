@@ -113,6 +113,9 @@ namespace AdvancedBot.Core.Services.Commands
 
         private void HandleActiveChannelCounters()
         {
+            Console.WriteLine($"Started handling all counters");
+            var start = DateTime.UtcNow;
+
             var guilds = _guild.GetAllGuilds();
             var flashInfo = GetFlashServerInfo();
             string paStatus = GetPaStatus();
@@ -121,7 +124,7 @@ namespace AdvancedBot.Core.Services.Commands
             {                
                 var guild = _client.GetGuild(guilds[i].Id);
 
-                if (!guilds[i].ChannelCounters.Any())
+                if (guild is null || !guilds[i].ChannelCounters.Any())
                     continue;
 
                 for (int j = 0; j < guilds[i].ChannelCounters.ToArray().Length; j++)
@@ -141,27 +144,27 @@ namespace AdvancedBot.Core.Services.Commands
                         case ChannelCounterType.FlashStatus:
                             string newName = $"Flash Status: {flashInfo.ServerStatus}";
                             if (channel.Name != newName)
-                                channel.ModifyAsync(x => x.Name = newName);
+                                channel.ModifyAsync(x => x.Name = newName).GetAwaiter().GetResult();
                             break;
                         case ChannelCounterType.PAStatus:
                             string newName1 = $"Mobile Status: {paStatus}";
                             if (channel.Name != newName1)
-                                channel.ModifyAsync(x => x.Name = newName1);
+                                channel.ModifyAsync(x => x.Name = newName1).GetAwaiter().GetResult();
                             break;
                         case ChannelCounterType.OnlinePlayers:
                             string newName2 = $"Flash Players: {flashInfo.OnlinePlayers}";
                             if (channel.Name != newName2)
-                                channel.ModifyAsync(x => x.Name = newName2);
+                                channel.ModifyAsync(x => x.Name = newName2).GetAwaiter().GetResult();
                             break;
                         case ChannelCounterType.TotalCommandsExecuted:
-                            string newName3 = $"Game Commands: {flashInfo.TotalCommandsExecuted}";
+                            string newName3 = $"Game Cmds: {flashInfo.TotalCommandsExecuted}";
                             if (channel.Name != newName3)
-                                channel.ModifyAsync(x => x.Name = newName3);
+                                channel.ModifyAsync(x => x.Name = newName3).GetAwaiter().GetResult();
                             break;
                         case ChannelCounterType.MemberCount:
                             string newName4 = $"Discord Members: {guild.MemberCount}";
                             if (channel.Name != newName4)
-                                channel.ModifyAsync(x => x.Name = newName4);
+                                channel.ModifyAsync(x => x.Name = newName4).GetAwaiter().GetResult();
                             break;
                         default:
                             break;
@@ -169,7 +172,7 @@ namespace AdvancedBot.Core.Services.Commands
                 }
             }
             
-            Console.WriteLine($"Updated all active counters.");
+            Console.WriteLine($"Finished updating all counters ({(DateTime.UtcNow - start).TotalSeconds}s)");
         }
 
         private FlashServerInfo GetFlashServerInfo()
