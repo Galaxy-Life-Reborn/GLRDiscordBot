@@ -36,7 +36,14 @@ namespace AdvancedBot.Core.Services.Commands
         {
             _timer.Stop();
 
-            HandleActiveChannelCounters();
+            try
+            {
+                HandleActiveChannelCounters();
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine(err);
+            }
 
             _timer.Start();
         }
