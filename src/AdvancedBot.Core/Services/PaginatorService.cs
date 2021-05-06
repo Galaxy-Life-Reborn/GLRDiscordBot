@@ -109,9 +109,9 @@ namespace AdvancedBot.Core.Services
         private async Task AddPaginatorReactionsAsync(IUserMessage message)
         {
             await message.AddReactionAsync(new Emoji("⏮️"), new RequestOptions{ RetryMode = RetryMode.RetryRatelimit });
-            await message.AddReactionAsync(new Emoji("◀️"), new RequestOptions{ RetryMode = RetryMode.RetryRatelimit });
-            await message.AddReactionAsync(new Emoji("▶️"), new RequestOptions{ RetryMode = RetryMode.RetryRatelimit });
-            await message.AddReactionAsync(new Emoji("⏭️"), new RequestOptions{ RetryMode = RetryMode.RetryRatelimit });
+            await Task.Delay(250).ContinueWith(t => message.AddReactionAsync(new Emoji("◀️"), new RequestOptions{ RetryMode = RetryMode.RetryRatelimit }));
+            await Task.Delay(250).ContinueWith(t => message.AddReactionAsync(new Emoji("▶️"), new RequestOptions{ RetryMode = RetryMode.RetryRatelimit }));
+            await Task.Delay(250).ContinueWith(t => message.AddReactionAsync(new Emoji("⏭️"), new RequestOptions{ RetryMode = RetryMode.RetryRatelimit }));
         }
 
         private async Task HandleUpdateMessagePagesAsync(PaginatedMessage msg)
