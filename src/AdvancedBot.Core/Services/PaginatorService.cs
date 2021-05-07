@@ -61,7 +61,7 @@ namespace AdvancedBot.Core.Services
             
             if (paginatedMessage.TotalPages == 1) return message;
             
-            await AddPaginatorReactionsAsync(message);
+            await message.AddReactionsAsync(new IEmote[] { new Emoji("⏮️"), new Emoji("◀️"), new Emoji("▶️"), new Emoji("⏭️")});
             AddNewTimer(message.Id);
             
             return message;
@@ -104,14 +104,6 @@ namespace AdvancedBot.Core.Services
             currentTimer.Start();
             
             _activeTimers.TryAdd(messageId, currentTimer);
-        }
-
-        private async Task AddPaginatorReactionsAsync(IUserMessage message)
-        {
-            // await message.AddReactionAsync(new Emoji("⏮️"));
-            // await message.AddReactionAsync(new Emoji("◀️"));
-            // await message.AddReactionAsync(new Emoji("▶️"));
-            // await message.AddReactionAsync(new Emoji("⏭️"));
         }
 
         private async Task HandleUpdateMessagePagesAsync(PaginatedMessage msg)
