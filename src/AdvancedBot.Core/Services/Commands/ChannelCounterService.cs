@@ -213,8 +213,12 @@ namespace AdvancedBot.Core.Services.Commands
 
             try
             {
-                var test = new HttpClient().GetAsync("http://pa.galaxylifereborn.com/star/status").GetAwaiter().GetResult();
-                newStatus = "Online";
+                var response = new HttpClient().GetAsync("http://pa.galaxylifereborn.com/star/status").GetAwaiter().GetResult();
+                if (response.IsSuccessStatusCode)
+                {
+                    newStatus = "Online";
+                }
+                else newStatus = "Offline";
             }
             catch (Exception exc)
             {
