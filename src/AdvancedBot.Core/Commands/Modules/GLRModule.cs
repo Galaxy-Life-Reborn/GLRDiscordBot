@@ -68,7 +68,7 @@ namespace GLR.Core.Commands.Modules
                                 .WithColor(Color.DarkBlue)
                                 .WithAuthor("", "", "")
                                 .WithFooter("Friends are ordered by the day you added them.", "");
-            await SendPaginatedMessageAsync(displayTexts, templateEmbed);
+            await SendPaginatedMessageAsync(null, displayTexts, templateEmbed);
         }
 
         [Command("statistics")][Alias("stats")]
@@ -137,7 +137,7 @@ namespace GLR.Core.Commands.Modules
                 .WithColor(Color.Purple)
                 .WithAuthor("", "", "");
 
-            await SendPaginatedMessageAsync(displayTexts, templateEmbed);
+            await SendPaginatedMessageAsync(null, displayTexts, templateEmbed);
         }
 
         // [Command("stat", RunMode = RunMode.Async)]
@@ -230,7 +230,7 @@ namespace GLR.Core.Commands.Modules
                                 .WithColor(Color.Purple)
                                 .WithAuthor("", "", "");
 
-            await SendPaginatedMessageAsync(displayTexts, templateEmbed);
+            await SendPaginatedMessageAsync(null, displayTexts, templateEmbed);
         }
     
         [Command("compare")][Alias("c")]

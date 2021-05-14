@@ -21,9 +21,9 @@ namespace AdvancedBot.Core.Commands.Modules.Base
             var result = Commands.AdvancedSearch(input);
             EmbedBuilder embed;
 
-            if (result.Value is null)
-                embed = Commands.CreateModuleInfoEmbed(result.Key, guild.DefaultDisplayPrefix);
-            else embed = Commands.CreateCommandInfoEmbed(result.Value, guild.DefaultDisplayPrefix);
+            if (result.Command is null)
+                embed = Commands.CreateModuleInfoEmbed(result.Module, guild.DefaultDisplayPrefix);
+            else embed = Commands.CreateCommandInfoEmbed(result.Command, guild.DefaultDisplayPrefix);
 
             await ReplyAsync("", false, embed.Build());
         }

@@ -58,10 +58,10 @@ namespace AdvancedBot.Core.Services.Commands
         {
             var result = _commands.AdvancedSearch(input);
 
-            if (result.Key is null)
-                guild.ToggleDeleteMsgOnCommand(_commands.FormatCommandName(result.Value));
+            if (result.Module is null)
+                guild.ToggleDeleteMsgOnCommand(_commands.FormatCommandName(result.Command));
             else 
-                ToggleDeleteMessageForModule(guild, result.Key);
+                ToggleDeleteMessageForModule(guild, result.Module);
         }
 
         public void AddIdToWhitelistForCommandOrModule(GuildAccount guild, string input, ulong id, bool isChannel)
