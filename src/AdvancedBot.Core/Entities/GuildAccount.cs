@@ -13,6 +13,7 @@ namespace AdvancedBot.Core.Entities
         public ulong ModRoleId { get; set; }
         public List<CommandSettings> Commands { get; set; }
         public List<ChannelCounter> ChannelCounters { get; set; } = new List<ChannelCounter>();
+        public string DefaultDisplayPrefix => string.IsNullOrEmpty(Prefixes[0]) ? "!" : Prefixes[0];
 
         #endregion
 
@@ -95,6 +96,12 @@ namespace AdvancedBot.Core.Entities
         {
             var command = Commands.Find(x => x.Name == name);
             command.IsEnabled = false;
+        }
+
+        public void ToggleDeleteMsgOnCommand(string name)
+        {
+            var command = Commands.Find(x => x.Name == name);
+            command.DeleteOriginalMessage = !command.DeleteOriginalMessage;
         }
 
         public void SetModRole(ulong id)

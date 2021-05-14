@@ -9,5 +9,6 @@
     <PackageReference Include="Humanizer" Version="2.8.26"/>
     <PackageReference Include="PuppeteerSharp" Version="2.0.3"/>
     <PackageReference Include="GLR.Net" Version="2.17.0"/>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0-preview.3.21201.4"/>
   </ItemGroup>
 </Project>

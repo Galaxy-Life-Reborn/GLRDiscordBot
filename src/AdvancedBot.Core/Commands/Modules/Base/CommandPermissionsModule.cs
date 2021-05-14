@@ -6,7 +6,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace AdvancedBot.Core.Commands.Modules
+namespace AdvancedBot.Core.Commands.Modules.Base
 {
     [RequireCustomPermission(GuildPermission.ManageChannels)]
     [Group("command")][Alias("c", "cmd")]
@@ -37,6 +37,18 @@ namespace AdvancedBot.Core.Commands.Modules
            
             Accounts.SaveGuildAccount(guild);
             await ReplyAsync($"Successfully disabled all commands associated with `{commandName}`.");
+        }
+
+        [Command("delete")]
+        [Summary("Toggles whether the original message should be deleted after the command ran.")]
+        public async Task ToggleDeleteMessageAsync([Remainder]string input)
+        {
+            var guild = Accounts.GetOrCreateGuildAccount(Context.Guild.Id);
+
+            Permissions.ToggleDeleteMessageForCommandOrModule(guild, input);
+
+            Accounts.SaveGuildAccount(guild);
+            await ReplyAsync($"Successfully toggled message-delete on all commands associated with `{input}`.");
         }
 
         [Command("modrole")]

@@ -7,6 +7,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using AdvancedBot.Core.Commands;
+using AdvancedBot.Core.Commands.TypeReaders;
 
 namespace AdvancedBot.Core.Services.Commands
 {
@@ -28,6 +29,7 @@ namespace AdvancedBot.Core.Services.Commands
 
         public async Task InitializeAsync()
         {
+            _commands.AddTypeReader<IUser>(new IUserTypeReader(), true);
             await _commands.AddModulesAsync(Assembly.GetExecutingAssembly(), _services);
 
             _client.MessageReceived += OnMessageReceived;
@@ -59,16 +61,27 @@ namespace AdvancedBot.Core.Services.Commands
 
         private async Task OnCommandExecuted(Optional<CommandInfo> cmd, ICommandContext ctx, IResult result)
         {
+            var guild = _accounts.GetOrCreateGuildAccount(ctx.Guild.Id);
+
             if (result.IsSuccess) 
             {
-                await ctx.Message.AddReactionAsync(new Emoji("✅"));
+                try
+                {
+                    if (guild.Commands.Find(x => x.Name == _commands.FormatCommandName(cmd.Value)).DeleteOriginalMessage)
+                    {
+                        await ctx.Message.DeleteAsync();
+                    }
+                    else await ctx.Message.AddReactionAsync(new Emoji("✅"));
+                }
+                catch{} // message no longer exists, just ignore
+
                 return;
             }
 
             if (result.Error == CommandError.UnknownCommand) return;
             else if (result.Error == CommandError.BadArgCount)
             {
-                await SendWrongParameterCountMessage(ctx, cmd.Value);
+                await SendWrongParameterCountMessage(ctx, cmd.Value, guild.DefaultDisplayPrefix);
                 return;
             }
             
@@ -96,14 +109,14 @@ namespace AdvancedBot.Core.Services.Commands
             await ctx.Channel.SendMessageAsync("", false, embed);
         }
     
-        private async Task SendWrongParameterCountMessage(ICommandContext ctx, CommandInfo command)
+        private async Task SendWrongParameterCountMessage(ICommandContext ctx, CommandInfo command, string prefix)
         {
-            var usage = _commands.GenerateCommandUsage(command);
+            var usage = _commands.GenerateCommandUsage(command, prefix);
 
             var embed = new EmbedBuilder()
             .WithTitle("Wrongly executed, correct example:")
             .WithDescription(usage)
-            .WithFooter("Tip: <> means mandatory, [] optional")
+            .WithFooter("Tip: <> means mandatory, [] means optional")
             .WithColor(Color.Red)
             .Build();
 
