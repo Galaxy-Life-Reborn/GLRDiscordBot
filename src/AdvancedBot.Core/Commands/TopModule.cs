@@ -80,7 +80,7 @@ namespace AdvancedBot.Core.Commands
             if (!user.GuildPermissions.Has(GuildPermission.ManageMessages) && !user.GuildPermissions.Has(GuildPermission.Administrator))
                 throw new Exception($"The bot needs 'Manage Messages' Guild Permission for this command.");
 
-            var footer = templateEmbed.Footer == null
+            var footer = templateEmbed.Footer == null || string.IsNullOrEmpty(templateEmbed.Footer.Text)
                 ? $"{Context.User.Username} ({Context.User.Id}) | Total Display Items: {displayTexts.Count()}"
                 : templateEmbed.Footer.Text;
 
