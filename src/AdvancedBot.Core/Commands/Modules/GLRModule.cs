@@ -5,6 +5,7 @@ using GLR.Net;
 using GLR.Net.Entities;
 using GLR.Net.Entities.Enums;
 using Humanizer;
+using Humanizer.Localisation;
 using PuppeteerSharp;
 using System;
 using System.Collections.Generic;
@@ -97,6 +98,39 @@ namespace GLR.Core.Commands.Modules
             .AddField("Attacks Done", profile.Statistics.AttacksDone, true)
             .WithFooter($"Requested by {Context.User.Username} | {Context.User.Id}")
             .Build());
+        }
+
+        [Command("advancedstats")]
+        [Alias("astats", "as")]
+        [Summary("Shows advanced statistics for said user.")]
+        public async Task ShowAdvancedStatsAsync([Remainder]string user = "")
+        {
+            if (string.IsNullOrEmpty(user)) user = Context.User.Username;
+
+            var profile = await _client.GetUserAsync(user);
+            var stats = await _client.GetAdvancedStatisticsAsync(profile.Info.Id);
+
+            var embed = new EmbedBuilder()
+            {
+                Title = $"Advanced Statistics for {profile.Info.Username}",
+                Url = profile.Info.ProfileUrl,
+                Color = Color.DarkMagenta,
+                ThumbnailUrl = $"https://web.galaxylifereborn.com/accounts/avatars/{profile.Info.Id}.png?t={DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
+            }
+            .AddField("Level", profile.Statistics.Level, true)
+            .AddField("Players Attacked", stats.PlayersAttacked, true)
+            .AddField("Npcs Attacked", stats.NpcsAttacked, true)
+            .AddField("Chips Spent", FormatNumbers(stats.ChipsSpent), true)
+            .AddField("Coins Spent", FormatNumbers(stats.CoinsSpent), true)
+            .AddField("Minerals Spent", FormatNumbers(stats.MineralsSpent), true)
+            .AddField("Friends Helped", FormatNumbers(stats.FriendsHelped), true)
+            .AddField("Gifts Received", FormatNumbers(stats.GiftsReceived), true)
+            .AddField("Gifts Sent", FormatNumbers(stats.GiftsSent), true)
+            .AddField("PlayTime", TimeSpan.FromMilliseconds(stats.TotalPlayTimeInMs).Humanize(3, minUnit: TimeUnit.Minute), true)
+            .AddField("Nukes Used", stats.NukesUsed, true)
+            .AddField("Obstacles Recycled", stats.ObstaclesRecycled, true);
+
+            await ReplyAsync("", false, embed.Build());
         }
 
         [Command("alliance")]
