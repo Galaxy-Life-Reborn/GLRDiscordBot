@@ -35,18 +35,17 @@ namespace GLR.Core.Commands.Modules
 
             var profile = await _client.GetUserInfo(user);
 
-            var displayRank = profile.RankInfo == Rank.Banned ? "**BANNED**"
-            : profile.RankInfo == Rank.Locked ? "**LOCKED**" : $"a {profile.RankInfo.Humanize(LetterCasing.Title)}";
+            var displayRank = profile.RankInfo == Rank.Banned ? "**Banned**" : profile.RankInfo == Rank.Locked ? "**Locked**" : $"{profile.RankInfo.Humanize(LetterCasing.Title)}";
 
             var embed = new EmbedBuilder()
-                .WithTitle($"Game profile for {profile.Username}")
+                .WithTitle($"Game Profile of {profile.Username}")
                 .WithUrl(profile.ProfileUrl)
                 .WithThumbnailUrl(profile.ImageUrl)
-                .WithDescription($"\nThis user has ID **{profile.Id}**." +
-                                $"\n**{profile.Username}** is {displayRank}.")
-                .AddField("Friends", $"This user has **{profile.Friends.Length}** friends.")
+                .WithDescription($"\nThis user has the Universe ID **{profile.Id}**." +
+                                $"\n**{profile.Username}** has the rank {displayRank}.")
+                .AddField("Friends", $"This user currently has **{profile.Friends.Length}** friends.")
                 .WithFooter($"Account created on {profile.CreatedAt.Value.ToLongDateString()}")
-                .WithColor(profile.Username == "Ezura" ? 000000 : GetColourBasedOnRank(profile.RankInfo))
+                .WithColor(GetColourBasedOnRank(profile.RankInfo))
                 .Build();
 
             await ReplyAsync("", false, embed);
@@ -341,11 +340,11 @@ namespace GLR.Core.Commands.Modules
                 case Rank.Supporter:
                     return 15710778;
                 case Rank.Locked:
-                    return 16777215;
-                case Rank.Banned:
-                    return 16777215;
-                default:
                     return 000000;
+                case Rank.Banned:
+                    return 000000;
+                default:
+                    return 16777215;
             }
         }
 
