@@ -16,8 +16,6 @@ namespace AdvancedBot.Core.Commands.Preconditions
         }
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
-            if (context.User.Id == 202095042372829184) return Task.FromResult(PreconditionResult.FromSuccess());
-
             var guildUser = context.User as SocketGuildUser;
 
             if (guildUser.GuildPermissions.Has(_permission) || guildUser.GuildPermissions.Has(GuildPermission.Administrator))
