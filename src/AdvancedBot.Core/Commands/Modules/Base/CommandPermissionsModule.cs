@@ -132,7 +132,7 @@ namespace AdvancedBot.Core.Commands.Modules.Base
                 Accounts.SaveGuildAccount(guild);
                 await ReplyAsync("", false, new EmbedBuilder()
                 {
-                    Description = $"Succesfully added {role.Mention} to the list of {input}."
+                    Description = $"Succesfully added {role.Mention} to the list of {commandName}."
                 }.Build());
             }
 
@@ -147,7 +147,7 @@ namespace AdvancedBot.Core.Commands.Modules.Base
                 Accounts.SaveGuildAccount(guild);
                 await ReplyAsync("", false, new EmbedBuilder()
                 {
-                    Description = $"Succesfully removed {role.Mention} from the list of {input}."
+                    Description = $"Succesfully removed {role.Mention} from the list of {commandName}."
                 }.Build());
             }
         }
@@ -210,7 +210,7 @@ namespace AdvancedBot.Core.Commands.Modules.Base
                 Accounts.SaveGuildAccount(guild);
                 await ReplyAsync("", false, new EmbedBuilder()
                 {
-                    Description = $"Succesfully added {channel.Mention} to the list for {input}."
+                    Description = $"Succesfully added {channel.Mention} to the list for {commandName}."
                 }.Build());
             }
 
@@ -225,7 +225,7 @@ namespace AdvancedBot.Core.Commands.Modules.Base
                 Accounts.SaveGuildAccount(guild);
                 await ReplyAsync("", false, new EmbedBuilder()
                 {
-                    Description = $"Succesfully removed {channel.Mention} from the list for {input}."
+                    Description = $"Succesfully removed {channel.Mention} from the list for {commandName}."
                 }.Build());
             }
         }
