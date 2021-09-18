@@ -111,6 +111,8 @@ namespace AdvancedBot.Core.Services
                         await GoToLastPageAsync(component.Message.Id);
                         break;
                 }
+
+                ResetTimer(component.Message.Id);
             }
         }
 
