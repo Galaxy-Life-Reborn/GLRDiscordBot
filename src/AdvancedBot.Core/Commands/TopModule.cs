@@ -80,13 +80,6 @@ namespace AdvancedBot.Core.Commands
             if (!user.GuildPermissions.Has(GuildPermission.ManageMessages) && !user.GuildPermissions.Has(GuildPermission.Administrator))
                 throw new Exception($"The bot needs 'Manage Messages' Guild Permission for this command.");
 
-            var footer = templateEmbed.Footer == null || string.IsNullOrEmpty(templateEmbed.Footer.Text)
-                ? $"{Context.User.Username} ({Context.User.Id}) | Total Display Items: {displayTexts.Count()}"
-                : templateEmbed.Footer.Text;
-
-            templateEmbed.WithTitle($"{templateEmbed.Title} | Page 1");
-            templateEmbed.WithDescription(string.Join("\n", displayTexts.Take(10)));
-            templateEmbed.WithFooter(footer);
             var displayItems = 0;
             
             if (displayTexts != null)
@@ -107,6 +100,7 @@ namespace AdvancedBot.Core.Commands
 
             templateEmbed.WithTitle($"{templateEmbed.Title} | Page 1");
             templateEmbed.WithFooter($"{templateEmbed.Footer?.Text}\n{Context.User.Username} ({Context.User.Id}) | Total Display Items: {displayItems}");
+            
 
             var message = await Paginator.HandleNewPaginatedMessageAsync(Context, displayFields, displayTexts, templateEmbed.Build());
             await Task.Delay(1000);    
