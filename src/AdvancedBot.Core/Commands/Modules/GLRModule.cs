@@ -141,20 +141,21 @@ namespace GLR.Core.Commands.Modules
             if (alliance is null)
                 throw new Exception($"Could not find alliance corresponding with {input}");
 
-            var emblemFileName = $"flag_{(int)alliance.Emblem.Shape}_{(int)alliance.Emblem.Pattern}_{(int)alliance.Emblem.Icon}.png";
+            //var emblemFileName = $"flag_{(int)alliance.Emblem.Shape}_{(int)alliance.Emblem.Pattern}_{(int)alliance.Emblem.Icon}.png";
 
             var embed = new EmbedBuilder()
             .WithTitle(alliance.Name)
             .WithDescription($"<:AFECounselor_Mobius:639094741631369247> Alliance owned by **{alliance.Owner.Name}** ({alliance.Owner.Id})\n\u200b")
             .WithColor(Color.DarkPurple)
-            .WithThumbnailUrl($"attachment://{emblemFileName}")
+            //.WithThumbnailUrl($"attachment://{emblemFileName}")
             .AddField("Members", alliance.MemberCount, true)
             .AddField("Wars Participated", 0, true)
             .AddField("Wars won", 0, true)
             .WithFooter($"Run !members {input} to see its members.")
             .Build();
 
-            await Context.Channel.SendFileAsync($"{_basePath}/Emblems/{emblemFileName}", embed: embed);
+            //await Context.Channel.SendFileAsync($"{_basePath}/Emblems/{emblemFileName}", embed: embed);
+            await Context.Channel.SendMessageAsync(embed: embed);
         }
 
         [Command("members")]
