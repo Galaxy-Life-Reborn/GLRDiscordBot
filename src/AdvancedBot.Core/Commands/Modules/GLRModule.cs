@@ -335,17 +335,17 @@ namespace GLR.Core.Commands.Modules
                 case Rank.Moderator:
                     return 2605694;
                 case Rank.TicketModerator:
-                    return 1973286;
+                    return 2605694;
                 case Rank.ContentCreator:
                     return 16729674;
                 case Rank.Grandmaster:
                     return 15790320;
                 case Rank.Tester:
                     return 7284617;
+                case Rank.UltraSupporter:
+                    return 7419530;
                 case Rank.Supporter:
                     return 15710778;
-                case Rank.UltraSupporter:
-                    return 1973286;
                 case Rank.Locked:
                     return 000000;
                 case Rank.Banned:
