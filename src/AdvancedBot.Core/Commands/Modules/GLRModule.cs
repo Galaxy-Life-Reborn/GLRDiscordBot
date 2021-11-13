@@ -331,11 +331,11 @@ namespace GLR.Core.Commands.Modules
                 case Rank.Administrator:
                     return 3172029;
                 case Rank.GameModerator:
-                    return 5427394;
+                    return 34122;
                 case Rank.Moderator:
                     return 2605694;
                 case Rank.TicketModerator:
-                    return 2605694;
+                    return 65423;
                 case Rank.ContentCreator:
                     return 16729674;
                 case Rank.Grandmaster:
