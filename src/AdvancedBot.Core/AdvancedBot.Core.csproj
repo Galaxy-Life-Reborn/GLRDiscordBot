@@ -9,6 +9,6 @@
     <PackageReference Include="PuppeteerSharp" Version="2.0.3"/>
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0-preview.3.21201.4"/>
     <PackageReference Include="GLR.Net" Version="2.21.0"/>
-    <PackageReference Include="Discord.Net.Labs" Version="3.0.3"/>
+    <PackageReference Include="Discord.Net.Labs" Version="3.4.7"/>
   </ItemGroup>
 </Project>
